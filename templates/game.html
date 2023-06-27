@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+<div id="game">
+    <div id="game-container">
+        <!-- Section 1: Opponent's profile and bingo board -->
+        <div class="player-section opponent">
+            <div class="profile-section1">
+                <!-- Profile related code here -->
+                <div class="profile-section1-picture">
+                    <!-- Profile picture will go here -->
+                </div>
+                <div class="nickname"></div>
+                <div class="record"></div>
+            </div>
+            <div class="bingo-container">
+                <div class="bingo-board">
+                    <!-- Bingo board will be filled dynamically -->
+                </div>
+                <button class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button>
+            </div>
+        </div>
+
+        <!-- Section 2: Ball drawing section -->
+        <div id="ball-drawing-section">
+            <div class="ball-container">
+                <!-- Balls will be filled dynamically -->
+            </div>
+            <div class="recent-balls">
+                <!-- Recent balls will be filled dynamically -->
+            </div>
+        </div>
+
+        <!-- Section 3: User's profile and bingo board -->
+        <div class="player-section user">
+            <div class="bingo-container">
+                <div class="bingo-board">
+                    <!-- Bingo board will be filled dynamically -->
+                </div>
+                <button class="bingo-button user-button" disabled>B<br>I<br>N<br>G<br>O</button>
+            </div>
+            <div class="profile-section1">
+                <!-- Profile related code here -->
+                <div class="profile-section1-picture">
+                    <!-- Profile picture will go here -->
+                </div>
+                <div class="nickname"></div>
+                <div class="record"></div>
+            </div>
+        </div>
+        <div id="gameOverModal">
+            <div id="gameOverModalContent">
+                <div class="modal-header" id="gameOverModalHeader">
+                    <!-- Victory or Defeat will be inserted here -->
+                </div>
+                <div class="modal-body" id="gameOverModalBody">
+                    <!-- A custom message will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button id="gameOverModalButton">마이페이지로 돌아가기</button>
+                </div>
+            </div>
+        </div>        
+    </div>
+</div>
+<script src="/static/socket.io.min.js"></script>
+<script src="../static/game.js"></script>
+</body>
+</html>

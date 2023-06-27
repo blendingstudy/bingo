@@ -1,0 +1,479 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+}
+
+.center-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-section,
+.button-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 3px;
+}
+
+.inputContainer {
+    position: relative;
+}
+
+#nickname-input {
+    border: none;
+    border-radius: 10px;
+    padding-top: 25px;
+    padding-left: 11px;
+    padding-right: 11px;
+    font-size: 23px;
+    outline: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    height: 50px;
+    width: 170px;
+    background-color: #f3f3f3;
+    transition: background-color 0.3s ease;
+}
+
+.inputContainer label {
+    position: absolute;
+    top: 5.5px;
+    left: 7px;
+    font-size: 12px;
+    color: #999;
+}
+
+#nickname-input:hover {
+    background-color: #ebebeb;
+}
+
+#login-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5472b8;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#login-button:hover {
+    background-color: #3f5d99;
+}
+
+#my-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    width: 500px;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #ffffff;
+    width: 200px;
+    transition: background-color 0.3s ease;
+}
+
+.profile-section:hover {
+    background-color: #f3f3f3;
+}
+
+.profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #d1d9e0;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.profile-picture:hover {
+    transform: scale(1.1);
+}
+
+.profile-info h2,
+.profile-info h3,
+.profile-info p {
+    margin: 0;
+    text-align: center;
+}
+
+.profile-info h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333333;
+}
+
+.profile-info h3 {
+    font-size: 20px;
+    margin-bottom: 5px;
+    color: #666666;
+}
+
+.profile-info p {
+    font-size: 16px;
+    color: #777;
+}
+
+#start-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5472b8;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#start-button:hover {
+    background-color: #3f5d99;
+}
+
+#waiting {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f7f7f7;
+    width: 500px;
+}
+
+#waiting-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.countdown-section {
+    width: 90%;
+    height: 10px;
+    background-color: #ebebeb;
+    margin-bottom: 60px;
+}
+
+#countdown-bar {
+    height: 100%;
+    background-color: #5472b8;
+    width: 100%; /* This will be decreased in waiting.js */
+    transition: width 0.3s ease;
+}
+
+.profiles-section {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 450px;
+    height: 250px;
+    margin-bottom: 20px;
+    align-items: stretch;
+}
+
+.profile-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30%;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    flex-grow: 1;
+    transition: box-shadow 0.3s ease;
+}
+
+.profile-box:hover {
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.vs-text {
+    font-size: 30px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #666666;
+    transition: color 0.3s ease;
+}
+
+.ready-button-section {
+    width: 90%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+#ready-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background-color: #5472b8;
+    color: #ffffff;
+    font-size: 20px;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#ready-button:hover {
+    background-color: #3f5d99;
+    transform: scale(1.05);
+}
+
+#game {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f7f7f7;
+    width: 500px;
+}
+
+#game-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around; 
+    width: 90%;
+    height: 80%;
+    padding: 5% 5%;
+}
+
+.player-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 30%;
+}
+
+.opponent .bingo-container {
+    flex-direction: row-reverse;
+}
+
+.bingo-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    height: 70%;
+}
+
+.bingo-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 5px;
+    justify-items: center;
+    align-items: center;
+    width: 230px;
+    height: 230px;
+    border: 1px solid #ccc;
+    background-color: #ffffff;
+}
+
+.cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: calc(100% - 5px);
+    height: calc(100% - 5px);
+    background-color: #f3f3f3;
+    transition: background-color 0.3s ease;
+}
+
+.cell.called {
+    background-color: #5472b8;
+}
+
+.bingo-button {
+    width: 60px;
+    height: 230px;
+    border: none;
+    background-color: #ccc;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease;
+}
+
+.bingo-button:hover {
+    background-color: #3f5d99;
+}
+
+/* Profile related CSS here */
+.profile-section1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #ffffff;
+    width: 100px;
+    height: 150px;
+    transition: background-color 0.3s ease;
+}
+
+.profile-section1:hover {
+    background-color: #f3f3f3;
+}
+
+.profile-section1-picture {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #d1d9e0;
+    margin-bottom: 10px;
+    transition: transform 0.3s ease;
+}
+
+.profile-section1-picture:hover {
+    transform: scale(1.1);
+}
+
+.profile-section1 .nickname {
+    font-size: 24px;
+    margin-bottom: 5px;
+    color: #333333;
+}
+
+.profile-section1 .record {
+    font-size: 16px;
+    color: #777;
+}
+
+#ball-drawing-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 20%;
+    position: relative;
+}
+
+.ball-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background-color: #efefef;
+    position: absolute;
+    left: 0;
+    overflow: hidden;
+    z-index: 1;
+    margin-left: 50px;
+}
+
+.recent-balls {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    width: 300px;
+    height: 80px;
+    border-radius: 20px;
+    background-color: #f3f3f3;
+    overflow: auto;
+    position: absolute;
+    right: 0;
+    z-index: 0;
+    margin-right: 50px;
+    padding-right: 20px;
+}
+
+@keyframes rollIn {
+    0% {
+        transform: translateX(-100%) rotate(0deg);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateX(0%) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+#gameOverModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+#gameOverModalContent {
+    position: relative;
+    margin: 15% auto;
+    padding: 20px;
+    width: 280px;
+    height: 280px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.modal-header {
+    text-align: center;
+    padding: 15px;
+    background-color: #5472b8;
+    color: white;
+    font-size: 2em; /* adjust this value to your liking */
+    font-weight: bold;
+}
+
+.modal-body {
+    text-align: center;
+    margin: 30px;
+    margin-top: 25%;
+    font-size: 15px; /* adjust this value to your liking */
+}
+
+.modal-footer {
+    text-align: center;
+    padding: 5px;
+    color: white;
+}
+
+#gameOverModalButton {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5472b8;
+    color: white;
+    cursor: pointer;
+    margin-top: 10%;
+    transition: background-color 0.3s ease;
+}
+
+#gameOverModalButton:hover {
+    background-color: #3f5d99;
+}

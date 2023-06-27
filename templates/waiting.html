@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="https://cdn.socket.io/4.2.0/socket.io.js"></script>
+    <script src="/static/waiting.js"></script>
+    <title>Waiting - Online Bingo Game</title>
+</head>
+<body>
+<div id="waiting">
+    <div id="waiting-page">
+        <div class="countdown-section">
+            <div id="countdown-bar"></div>
+        </div>
+        <div class="profiles-section">
+            <div class="profile-box own-profile">
+                <div class="profile-picture">
+                    <!-- Profile picture will go here -->
+                </div>
+                <div class="profile-info">
+                    <h2 id="own-nickname">Nickname</h2>
+                    <h3>전적</h3>
+                    <p id="own-record">0승 0패</p>
+                </div>
+            </div>
+
+            <div class="vs-text">VS</div>
+
+            <div class="profile-box opponent-profile">
+                <!-- Opponent's profile will go here -->
+            </div>
+        </div>
+        <div class="ready-button-section">
+            <button id="ready-button">준비!</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
