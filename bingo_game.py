@@ -6,9 +6,9 @@ from user import User
 from bingo_card import BingoCard
 
 class BingoGame:
-    def __init__(self):
+    def __init__(self, game_room_num):
         self._players = []
-        self._game_room_num = 1
+        self._game_room_num = game_room_num
 
     def generate_random_number(self):
         # used_numbers = [player.number for player in self._players]

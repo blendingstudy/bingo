@@ -17,7 +17,8 @@ Session(app)
 socketio = SocketIO(app, manage_session=False)
 
 client_sessions = {}
-bingo_games = []
+bingo_games = {}
+game_room_cnt = 1
 
 # Matchmaking queue
 queue = Queue()
@@ -118,6 +119,7 @@ def ready(data):
 
     queue.put(player)
 
+    # 큐에 2명 이상이 들어가면 게임 준비.
     if queue.qsize() >= 2:
         ready_game()
 
@@ -130,10 +132,14 @@ def ready_game():
     player_b = queue.get()
 
     #게임방 만들어야함.
-    bingo_game = BingoGame()
+    global game_room_cnt
+    bingo_game = BingoGame(game_room_cnt)
     bingo_game.add_player(player_a)
     bingo_game.add_player(player_b)
-    bingo_games.append(bingo_game)
+
+    bingo_games[game_room_cnt] = bingo_game
+
+    game_room_cnt += 1
 
     #플레이어 a에겐 b 정보 건내줌
     response_data = {"reader": True, "game_room_num": bingo_game.get_game_room_num(), "opp_nickname": player_b.get_nickname(), "opp_record": player_b.get_record()}
@@ -145,8 +151,10 @@ def ready_game():
     print(f"send to b-sid: {player_b.get_session_id()}")
 
 @socketio.on('startGame', namespace='/')
-def start_game():
-    bingo_game = bingo_games[0]
+def start_game(data):
+
+    game_room_num = data["game_room_num"]
+    bingo_game = bingo_games[game_room_num]
     print(f"----bingoGame! {bingo_game}")
     bingo_game.start_game()
 

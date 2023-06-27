@@ -166,7 +166,7 @@ function startGame(){
     alert("게임 시작!")
 
     const data = {"game_room_num": gameRoomNum}
-    socket.emit("startGame")
+    socket.emit("startGame", data)
 }
 
 socket.on("createBingoCard", function(data) {
