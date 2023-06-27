@@ -1,98 +1,3 @@
-// const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-
-// // Variables
-// let countdownTime = 5; // 5 seconds countdown
-// let countdownInterval = null;
-// const readyButton = document.getElementById('ready-button');
-// const countdownBar = document.getElementById('countdown-bar');
-// const ownProfileBox = document.querySelector('.own-profile');
-// const opponentProfileBox = document.querySelector('.opponent-profile');
-
-// // Fetch own profile from local storage
-// let userNickname = localStorage.getItem('nickname');
-// initializeOwnProfile(userNickname, '0승 0패');
-
-// // Fetch own record from server
-// socket.emit('fetchRecord');
-
-// socket.on('fetchRecordResponse', function(data) {
-//     let win = data.record && data.record.win ? data.record.win : 0;
-//     let lose = data.record && data.record.lose ? data.record.lose : 0;
-//     let record = win + '승 ' + lose + '패';
-//     initializeOwnProfile(userNickname, record);
-// });
-
-// // Join the matchmaking queue
-// socket.emit('joinQueue');
-
-// socket.on('matchFound', function(data) {
-//     // Initialize opponent's profile
-//     let win = data.record && data.record.win ? data.record.win : 0;
-//     let lose = data.record && data.record.lose ? data.record.lose : 0;
-//     let record = win + '승 ' + lose + '패';
-//     initializeOpponentProfile(data.nickname, record);
-
-//     // Start the countdown
-//     startCountdown();
-// });
-
-// readyButton.addEventListener('click', () => {
-//     // Stop the countdown
-//     clearInterval(countdownInterval);
-    
-//     // Change the button state
-//     readyButton.textContent = '준비완료';
-//     readyButton.disabled = true;
-
-//     // Notify the server that the user is ready to play
-//     socket.emit('ready');
-// });
-
-// socket.on('startGame', function() {
-//     window.location.href = '/game';
-// });
-
-// // Functions
-// function initializeOwnProfile(nickname, record) {
-//     ownProfileBox.innerHTML = generateProfileHTML(nickname, record);
-// }
-
-// function initializeOpponentProfile(nickname, record) {
-//     // Replace the placeholder with the actual profile
-//     opponentProfileBox.innerHTML = generateProfileHTML(nickname, record);
-// }
-
-// function generateProfileHTML(nickname, record) {
-//     return `
-//         <div class="profile-picture">
-//             <!-- Profile picture will go here -->
-//         </div>
-//         <div class="profile-info">
-//             <h2>${nickname}</h2>
-//             <h3>전적</h3>
-//             <p>${record}</p>
-//         </div>
-//     `;
-// }
-
-// function startCountdown() {
-//     countdownInterval = setInterval(() => {
-//         countdownTime -= 1;
-
-//         // Update the countdown bar
-//         countdownBar.style.width = `${(countdownTime / 5) * 100}%`;
-
-//         // End of countdown
-//         if (countdownTime === 0) {
-//             clearInterval(countdownInterval);
-
-//             // Notify the server that the user failed to ready up in time.
-//             socket.emit('notReady');
-//             // The server should handle matchmaking again.
-//         }
-//     }, 1000);
-// }
-
 console.log("대기방 입장")
 
 let userNickname = localStorage.getItem('nickname');  // Retrieve nickname from local storage
@@ -134,7 +39,7 @@ function ready(){
 
     const data = {"nickname" : userNickname}
 
-    socket.emit('ready', data)
+    socket.emit('waiting', data)
 }
 
 socket.on('readyGame', function(data) {
@@ -160,6 +65,7 @@ socket.on('readyGame', function(data) {
     }
 
     gameRoomNum = data.game_room_num
+    localStorage.setItem("gameRoomNum", gameRoomNum)
 });
 
 function startGame(){

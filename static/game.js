@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
     }
 
+    // 여기!! 여기가 빙고판 입력하는데임!
     function displayBoard(selector, board) {
         let container = document.querySelector(selector);
         container.textContent = ''; // clear existing contents
