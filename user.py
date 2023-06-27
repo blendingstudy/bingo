@@ -3,7 +3,7 @@ from bingo_card import BingoCard
 class User:
     def __init__(self, nickname):
         self._nickname = nickname
-        self._bingo_card = BingoCard()
+        self._bingo_card = None
         self._session_id = None
         self._record = {'win': 0, 'lose': 0}
 
@@ -14,7 +14,7 @@ class User:
         return self._record
 
     def get_bingo_card(self):
-        return self._bingo_card
+        return self._bingo_card.get_card()
 
     def get_session_id(self):
         return self._session_id
@@ -27,3 +27,6 @@ class User:
 
     def lose(self):
         self._record['lose'] += 1
+
+    def generate_bingo_card(self):
+        self._bingo_card = BingoCard()

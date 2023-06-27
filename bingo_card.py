@@ -5,6 +5,8 @@ class BingoCard:
         self.card = [[0] * 5 for _ in range(5)]  # 빙고판
         self.check = [[0] * 5 for _ in range(5)]  # 빙고판 체크
 
+        self.create_card()
+
     def get_card(self):
         return self.card
 

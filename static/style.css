@@ -477,3 +477,9 @@ body {
 #gameOverModalButton:hover {
     background-color: #3f5d99;
 }
+
+.ready-button-section button:disabled {
+    opacity: 0.5; /* 투명도 조절 */
+    cursor: not-allowed; /* 커서 스타일 변경 */
+    /* 기타 원하는 스타일 지정 */
+}

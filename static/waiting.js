@@ -98,6 +98,8 @@ console.log("대기방 입장")
 let userNickname = localStorage.getItem('nickname');  // Retrieve nickname from local storage
 let socket = io();
 
+let gameRoomNum;
+
 getUserInfo()
 ready()
 
@@ -135,10 +137,11 @@ function ready(){
     socket.emit('ready', data)
 }
 
-socket.on('startGame', function(data) {
+socket.on('readyGame', function(data) {
 
     console.log(data)
 
+    // 상대 플레이어 화면에 표시
     opp_player = document.getElementsByClassName("profile-box opponent-profile")
     opp_player.item(0).innerHTML = `
         <div class="profile-picture">
@@ -151,7 +154,23 @@ socket.on('startGame', function(data) {
         </div>
     `;
 
-    // 상대방 화면에 표시
-    // 3초후 게임 시작
-    // window.location.href = '/game';
+    if(data.reader){
+        start_buttom = document.getElementById("ready-button")
+        start_buttom.disabled  = false
+    }
+
+    gameRoomNum = data.game_room_num
 });
+
+function startGame(){
+    alert("게임 시작!")
+
+    const data = {"game_room_num": gameRoomNum}
+    socket.emit("startGame")
+}
+
+socket.on("createBingoCard", function(data) {
+    console.log(data)
+
+    // window.location.href = '/game';
+})

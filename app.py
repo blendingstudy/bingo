@@ -6,6 +6,7 @@ import threading
 import time
 from queue import Queue
 from user import User
+from bingo_game import BingoGame
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
@@ -16,7 +17,7 @@ Session(app)
 socketio = SocketIO(app, manage_session=False)
 
 client_sessions = {}
-bingo_game = None
+bingo_games = []
 
 # Matchmaking queue
 queue = Queue()
@@ -118,27 +119,36 @@ def ready(data):
     queue.put(player)
 
     if queue.qsize() >= 2:
-        start_game()
+        ready_game()
 
     # print(queue)
 
-def start_game():
-    #플레이어 a 정보 꺼냄
+def ready_game():
+    #플레이어 a 정보 꺼냄 -> 먼저 들어온 사람이 방장이 되어, 게임시작 권한을 갖게됨.
     player_a = queue.get()
     #플레이어 b 정보 꺼냄
     player_b = queue.get()
 
+    #게임방 만들어야함.
+    bingo_game = BingoGame()
+    bingo_game.add_player(player_a)
+    bingo_game.add_player(player_b)
+    bingo_games.append(bingo_game)
+
     #플레이어 a에겐 b 정보 건내줌
-    response_data = {"reader": True, "opp_nickname": player_b.get_nickname(), "opp_record": player_b.get_record()}
-    emit('startGame', response_data, room=player_a.get_session_id())
+    response_data = {"reader": True, "game_room_num": bingo_game.get_game_room_num(), "opp_nickname": player_b.get_nickname(), "opp_record": player_b.get_record()}
+    emit('readyGame', response_data, room=player_a.get_session_id())
     print(f"send to a-sid: {player_a.get_session_id()}")
     #플레이어 b에겐 a 정보 건내줌
-    response_data = {"reader": False, "opp_nickname": player_a.get_nickname(), "opp_record": player_a.get_record()}
-    emit('startGame', response_data, room=player_b.get_session_id())
+    response_data = {"reader": False, "game_room_num": bingo_game.get_game_room_num(), "opp_nickname": player_a.get_nickname(), "opp_record": player_a.get_record()}
+    emit('readyGame', response_data, room=player_b.get_session_id())
     print(f"send to b-sid: {player_b.get_session_id()}")
 
-    #게임 시작해야함
-
+@socketio.on('startGame', namespace='/')
+def start_game():
+    bingo_game = bingo_games[0]
+    print(f"----bingoGame! {bingo_game}")
+    bingo_game.start_game()
 
 @socketio.on('gameOver', namespace='/')
 def on_game_over(data):
