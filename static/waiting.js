@@ -130,27 +130,28 @@ function getUserInfo(){
 function ready(){
     console.log("게임 준비 시도:", userNickname)
 
-    const url = "http://localhost:5000/ready?nickname=" + userNickname 
+    const data = {"nickname" : userNickname}
 
-    fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json' // 요청 헤더에 JSON 형식을 명시적으로 지정
-        },
-    })
-        .then(response => response.json()) // 응답을 JSON 형식으로 파싱
-        .then(data => {
-            // 응답 데이터 처리
-            console.log(data)
-        })
-        .catch(error => {
-            // 에러 처리
-            alert("유저정보 요청 실패")
-        });
+    socket.emit('ready', data)
 }
 
-socket.on('startGame', function() {
+socket.on('startGame', function(data) {
+
+    console.log(data)
+
+    opp_player = document.getElementsByClassName("profile-box opponent-profile")
+    opp_player.item(0).innerHTML = `
+        <div class="profile-picture">
+            <!-- Profile picture will go here -->
+        </div>
+        <div class="profile-info">
+            <h2>${data.opp_nickname}</h2>
+            <h3>전적</h3>
+            <p>${data.opp_record.win}승 ${data.opp_record.lose}패</p>
+        </div>
+    `;
+
     // 상대방 화면에 표시
     // 3초후 게임 시작
-    window.location.href = '/game';
+    // window.location.href = '/game';
 });
