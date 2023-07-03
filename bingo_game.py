@@ -14,6 +14,7 @@ class BingoGame:
         self._game_room_num = game_room_num
         self._ready_cnt = 0
         self._scheduler = sched.scheduler(time.time, time.sleep)
+        self._random_numbers = []
 
         self.generate_players_bingo_card()
 
@@ -22,14 +23,22 @@ class BingoGame:
         # number = random.choice([i for i in range(1, 51) if i not in used_numbers])
         # 바꿔야함!
         # 필드로 배열 만들고, 거기에 여지껏 나온 숫자 저장해놓아야 함.
-        number = random.randint(1, 50)
+        number = random.sample([x for x in range(1, 51) if x not in  self._random_numbers], 1)[0]
+        self._random_numbers.append(number)
         response_data = {"num":number}
 
         for player in self._players.values():
-            print("emit waiting...")
             emit("generateRandomNumber", response_data, room=player.get_session_id())
 
-        self._scheduler.enter(2, 1, self.generate_random_number, ())
+        # 50개 다 발표하면 종료
+        # 50개로 수정해야 함!!
+        if len(self._random_numbers) == 15:
+            return
+        else:
+            self._scheduler.enter(2, 1, self.generate_random_number, ())
+
+        
+
 
     def add_player(self, player):
         self._players[player.get_nickname()] = player
@@ -40,9 +49,8 @@ class BingoGame:
         if len(self._players) < 2:
             raise ValueError("Error: Not enough players to start the game.")
 
-        #2초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
-        
-        self._scheduler.enter(2, 1, self.generate_random_number, ())  # 함수 호출 시작
+        #3초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
+        self._scheduler.enter(0, 1, self.generate_random_number, ())  # 함수 호출 시작
         self._scheduler.run()
         
     def generate_players_bingo_card(self):

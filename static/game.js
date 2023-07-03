@@ -1,3 +1,9 @@
+const MAX_NUM = 30;
+const BINGO_SIZE = 5;
+const MAX_BALLS_DISPLAYED = 5;
+const BOARD_SIZE = BINGO_SIZE * BINGO_SIZE;
+const MIN_BINGO_LINES = 2;
+
 const socket = io() // 웹소켓 초기화
 const gameRoomNum = Number(localStorage.getItem("gameRoomNum")) // 게임방 번호
 const nickname = localStorage.getItem("nickname") // 닉네임
@@ -54,6 +60,10 @@ socket.on("bingoGameInfo", function(data) {
 // 랜덤 숫자 발표
 socket.on("generateRandomNumber", function(data) {
     console.log(data)
+    const ball = data.num
+    let ballColor = getRandomColor()
+    displayBall('.ball-container', ball, ballColor);
+    displayBall('.recent-balls', ball, ballColor);
 })
 
 function initializeOwnProfile(nickname, record) {
@@ -104,6 +114,65 @@ function displayBoard(selector, board) {
         }
     }
 }
+
+
+
+function displayBall(selector, ball, color) {
+    let container = document.querySelector(selector);
+    let ballElement = document.createElement('div');
+    ballElement.classList.add('ball');
+    ballElement.textContent = ball;
+
+    // Give the ball a shape with a background color
+    ballElement.style.width = "40px";
+    ballElement.style.height = "40px";
+    ballElement.style.borderRadius = "50%";
+    ballElement.style.display = "inline-block";
+    ballElement.style.textAlign = "center";
+    ballElement.style.lineHeight = "40px";
+    ballElement.style.backgroundColor = color;
+
+    if (selector === '.recent-balls') {
+        if (container.childElementCount === MAX_BALLS_DISPLAYED) {
+            setTimeout(() => {  // Add a delay before removing the oldest ball
+                container.removeChild(container.lastElementChild);
+            }, 505);  // Delay time in milliseconds (505ms = 0.505s)
+        }
+        ballElement.style.animation = "rollIn 0.5s ease-out";  // Make the animation faster
+        container.insertBefore(ballElement, container.firstChild);
+    } else {
+        // If the container is for the ball-container, just replace the existing ball
+        container.innerHTML = "";
+        container.appendChild(ballElement);
+    }
+}
+
+function getRandomColor() {
+    const colors = ["#b5c4e0", "#879ebf", "#d6d1e0", "#aebfd9", "#c4ccd9"]; // Change these to your preferred colors
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+// function drawBall() {
+//     if (nextBallIndex < balls.length) {
+//         let ball = balls[nextBallIndex++];
+//         document.querySelectorAll('.bingo-board .cell').forEach(cell => {
+//             if (cell.textContent == ball) {
+//                 cell.classList.add('called');
+//             }
+//         });
+//         let ballColor = getRandomColor();
+//         displayBall('.ball-container', ball, ballColor);
+//         displayBall('.recent-balls', ball, ballColor);
+//         document.querySelectorAll('.bingo-button').forEach(button => {
+//             button.disabled = !checkBingo(button.closest('.player-section').querySelector('.bingo-board'));
+//             button.style.backgroundColor = button.disabled ? '#ccc' : '#2c4681';
+//         });
+//         if (!gameOver) {
+//             setTimeout(drawBall, 2000);
+//         }
+//     }
+// }
+
 
 // 모든 플레이어가 입장하면 그때부터 게임 시작.
 
