@@ -65,6 +65,8 @@ socket.on('readyGame', function(data) {
     }
 
     gameRoomNum = data.game_room_num
+
+    // 로컬에 게임방 번호 저장
     localStorage.setItem("gameRoomNum", gameRoomNum)
 });
 
@@ -79,4 +81,8 @@ socket.on("createBingoCard", function(data) {
     console.log(data)
 
     // window.location.href = '/game';
+})
+
+socket.on("moveGamePage", function() {
+    window.location.href = '/game';
 })

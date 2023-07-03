@@ -165,8 +165,51 @@ def start_game(data):
     game_room_num = data["game_room_num"]
     bingo_game = bingo_games[game_room_num]
     print(f"----bingoGame! {bingo_game}")
-    bingo_game.start_game()
+    
+    for user in bingo_game.get_players().values():
+        print("게임방으로 페이지 이동 요청")
+        emit("moveGamePage", room=user.get_session_id())
+
+# [SOCKET] resetSID
+# 유저의 sid 다시 설정
+@socketio.on("resetSID", namespace='/')
+def reset_sid(data):
+
+    nickname = data["nickname"]
+    if nickname in client_sessions.keys():
+        userInfo = client_sessions[nickname]
+        userInfo.set_session_id(request.sid)
+        print("sid 바꿈")
+
+# [SOCKET] enterGameRoom
+# 플레이어가 게임방에 들어왔음을 알림
+@socketio.on("enterGameRoom", namespace='/')
+def enter_game_room(data):
+
+    # print("플레이어 들어옴", data)
+
+    game_room_num = data["gameRoomNum"]
+
+    print("게임방 번호", game_room_num, type(game_room_num))
+    print(bingo_games.keys())
+    bingo_game = bingo_games[game_room_num]
+
+    bingo_game.player_ready()
+
+    # 플레이어 정보, 상대방 정보, 내 빙고판 정보 넘겨주기.
+    nickname = data["nickname"]
+    response_data = {
+        "player" : bingo_game.get_my_info(nickname),
+        "opp_player" : bingo_game.get_opp_info(nickname),
+        # "bingo_card" : bingo_game.get_my_bingo_card(nickname)
+    }
+    emit("bingoGameInfo", response_data, room=request.sid)
+
+    print(bingo_game.get_my_bingo_card(nickname))
+
+    # 다 게임방에 들어왔으면 게임 시작하기.
+
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True)
