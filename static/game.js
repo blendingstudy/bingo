@@ -3,6 +3,7 @@ const BINGO_SIZE = 5;
 const MAX_BALLS_DISPLAYED = 5;
 const BOARD_SIZE = BINGO_SIZE * BINGO_SIZE;
 const MIN_BINGO_LINES = 2;
+let bingoCardCells;
 
 const socket = io() // 웹소켓 초기화
 const gameRoomNum = Number(localStorage.getItem("gameRoomNum")) // 게임방 번호
@@ -39,9 +40,9 @@ function enterGameRoom(){
 // 화면에 정보 띄움.
 socket.on("bingoGameInfo", function(data) {
     // console.log(data)
-    myPlayer = data.player
-    oppPlayer = data.opp_player
-    bingoCard = data.bingo_card
+    const myPlayer = data.player
+    const oppPlayer = data.opp_player
+    const bingoCard = data.bingo_card
 
     console.log(myPlayer)
     console.log(oppPlayer)
@@ -55,6 +56,11 @@ socket.on("bingoGameInfo", function(data) {
 
     displayBoard('.user .bingo-board', bingoCard);
     displayBoard('.opponent .bingo-board', null);
+
+    bingoCardCells = document.querySelectorAll(".user .bingo-board .cell")
+    console.log(bingoCardCells)
+    
+    // let board = [...container.querySelectorAll('.cell')].map(cell => cell.classList.contains('called'));
 })
 
 // 랜덤 숫자 발표
@@ -64,6 +70,13 @@ socket.on("generateRandomNumber", function(data) {
     let ballColor = getRandomColor()
     displayBall('.ball-container', ball, ballColor);
     displayBall('.recent-balls', ball, ballColor);
+
+    if(data.isChecked){
+        const location = Number(data.x * 5) + Number(data.y)
+        console.log("체크! " + location)
+        
+        // cell.classList.add('called');
+    }
 })
 
 function initializeOwnProfile(nickname, record) {
@@ -115,8 +128,6 @@ function displayBoard(selector, board) {
     }
 }
 
-
-
 function displayBall(selector, ball, color) {
     let container = document.querySelector(selector);
     let ballElement = document.createElement('div');
@@ -151,6 +162,19 @@ function getRandomColor() {
     const colors = ["#b5c4e0", "#879ebf", "#d6d1e0", "#aebfd9", "#c4ccd9"]; // Change these to your preferred colors
     return colors[Math.floor(Math.random() * colors.length)];
 }
+
+// function checkBingo(container) {
+//     let board = [...container.querySelectorAll('.cell')].map(cell => cell.classList.contains('called'));
+//     let bingoCount = 0;
+//     for (let i = 0; i < BINGO_SIZE; i++) {
+//         if ([...Array(BINGO_SIZE)].every((_, j) => board[i * BINGO_SIZE + j])) bingoCount++; // check row
+//         if ([...Array(BINGO_SIZE)].every((_, j) => board[i + j * BINGO_SIZE])) bingoCount++; // check column
+//     }
+//     if ([...Array(BINGO_SIZE)].every((_, i) => board[i * (BINGO_SIZE + 1)])) bingoCount++; // check main diagonal
+//     if ([...Array(BINGO_SIZE)].every((_, i) => board[(i + 1) * (BINGO_SIZE - 1)])) bingoCount++; // check other diagonal
+
+//     return bingoCount >= MIN_BINGO_LINES;
+// }
 
 // function drawBall() {
 //     if (nextBallIndex < balls.length) {

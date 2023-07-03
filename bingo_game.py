@@ -19,15 +19,13 @@ class BingoGame:
         self.generate_players_bingo_card()
 
     def generate_random_number(self):
-        # used_numbers = [player.number for player in self._players]
-        # number = random.choice([i for i in range(1, 51) if i not in used_numbers])
-        # 바꿔야함!
-        # 필드로 배열 만들고, 거기에 여지껏 나온 숫자 저장해놓아야 함.
+        # 1~50사이 중복없이 랜덤 숫자 발표
         number = random.sample([x for x in range(1, 51) if x not in  self._random_numbers], 1)[0]
         self._random_numbers.append(number)
-        response_data = {"num":number}
 
         for player in self._players.values():
+            isChecked, x, y = player.check_number(number)
+            response_data = {"num":number, "isChecked":isChecked, "x":x, "y":y}
             emit("generateRandomNumber", response_data, room=player.get_session_id())
 
         # 50개 다 발표하면 종료

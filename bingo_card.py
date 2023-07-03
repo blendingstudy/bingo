@@ -26,7 +26,9 @@ class BingoCard:
             for j in range(5):
                 if self.card[i][j] == number:
                     self.check[i][j] = 1
-                    return
+                    return True, i, j
+        
+        return False, -1, -1
 
     def check_bingo(self):
         # 가로 빙고 체크

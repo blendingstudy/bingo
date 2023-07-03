@@ -30,3 +30,6 @@ class User:
 
     def generate_bingo_card(self):
         self._bingo_card = BingoCard()
+
+    def check_number(self, number):
+        return self._bingo_card.check_number(number)
