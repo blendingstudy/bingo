@@ -209,6 +209,8 @@ def enter_game_room(data):
     print(bingo_game.get_my_bingo_card(nickname))
 
     # 다 게임방에 들어왔으면 게임 시작하기.
+    if bingo_game.is_every_player_ready():
+        bingo_game.start_game()
 
 
 

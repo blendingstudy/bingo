@@ -30,9 +30,80 @@ function enterGameRoom(){
 
 
 // 상대방 유저정보와 내 유저정보, 내 빙고판 데이터 받기.
+// 화면에 정보 띄움.
 socket.on("bingoGameInfo", function(data) {
+    // console.log(data)
+    myPlayer = data.player
+    oppPlayer = data.opp_player
+    bingoCard = data.bingo_card
+
+    console.log(myPlayer)
+    console.log(oppPlayer)
+    console.log(bingoCard)
+
+    const myRecord = `${myPlayer.record.win}승 ${myPlayer.record.lose}패`
+    initializeOwnProfile(myPlayer.nickname, myRecord)
+
+    const oppRecord = `${oppPlayer.record.win}승 ${oppPlayer.record.lose}패`
+    initializeOpponentProfile(oppPlayer.nickname, oppRecord)
+
+    displayBoard('.user .bingo-board', bingoCard);
+    displayBoard('.opponent .bingo-board', null);
+})
+
+// 랜덤 숫자 발표
+socket.on("generateRandomNumber", function(data) {
     console.log(data)
 })
+
+function initializeOwnProfile(nickname, record) {
+    const ownProfileBox = document.querySelector('.user .profile-section1');
+    ownProfileBox.innerHTML = generateProfileHTML(nickname, record);
+}
+
+function initializeOpponentProfile(nickname, record) {
+    const opponentProfileBox = document.querySelector('.opponent .profile-section1');
+    opponentProfileBox.innerHTML = generateProfileHTML(nickname, record);
+}
+
+function generateProfileHTML(nickname, record) {
+    return `
+        <div class="profile-section1-picture">
+            <!-- Profile picture will go here -->
+        </div>
+        <div class="profile-info">
+            <h2 class="nickname">${nickname}</h2>
+            <h3>전적</h3>
+            <p class="record">${record}</p>
+        </div>
+    `;
+}
+
+function displayBoard(selector, board) {
+    let container = document.querySelector(selector);
+    container.textContent = ''; // clear existing contents
+
+    if(board == null) {
+        for(let i=0; i<5; i++){
+
+            for(let j=0; j<5; j++){
+                let cell = document.createElement('div');
+                cell.classList.add('cell');
+                container.appendChild(cell);
+            }
+        }
+    }
+    else{
+        for (let row of board) {
+            for (let num of row) {
+                let cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.textContent = num;
+                container.appendChild(cell);
+            }
+        }
+    }
+}
 
 // 모든 플레이어가 입장하면 그때부터 게임 시작.
 

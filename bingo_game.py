@@ -4,12 +4,16 @@ from flask_session import Session  # for server-side sessions
 import random
 from user import User
 from bingo_card import BingoCard
+import threading
+import sched
+import time
 
 class BingoGame:
     def __init__(self, game_room_num):
         self._players = {}
         self._game_room_num = game_room_num
         self._ready_cnt = 0
+        self._scheduler = sched.scheduler(time.time, time.sleep)
 
         self.generate_players_bingo_card()
 
@@ -17,25 +21,34 @@ class BingoGame:
         # used_numbers = [player.number for player in self._players]
         # number = random.choice([i for i in range(1, 51) if i not in used_numbers])
         # 바꿔야함!
-        number = random.choice()
-        return number
+        # 필드로 배열 만들고, 거기에 여지껏 나온 숫자 저장해놓아야 함.
+        number = random.randint(1, 50)
+        response_data = {"num":number}
+
+        for player in self._players.values():
+            print("emit waiting...")
+            emit("generateRandomNumber", response_data, room=player.get_session_id())
+
+        self._scheduler.enter(2, 1, self.generate_random_number, ())
 
     def add_player(self, player):
         self._players[player.get_nickname()] = player
 
     def start_game(self):
+        print("-----bingo game start!!-----")
+
         if len(self._players) < 2:
             raise ValueError("Error: Not enough players to start the game.")
 
         #2초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
-
+        
+        self._scheduler.enter(2, 1, self.generate_random_number, ())  # 함수 호출 시작
+        self._scheduler.run()
+        
     def generate_players_bingo_card(self):
         for player in self._players.values():
             player.generate_bingo_card()
             # print("crate bingo card: ", player.get_bingo_card())
-
-            response_data = {"bingo_card":player.get_bingo_card()}
-            # emit("createBingoCard", response_data, room=player.get_session_id())
 
     def get_game_room_num(self):
         return self._game_room_num
