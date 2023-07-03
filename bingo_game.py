@@ -29,21 +29,19 @@ class BingoGame:
 
         #2초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
 
+    def generate_players_bingo_card(self):
+        for player in self._players.values():
+            player.generate_bingo_card()
+            # print("crate bingo card: ", player.get_bingo_card())
+
+            response_data = {"bingo_card":player.get_bingo_card()}
+            # emit("createBingoCard", response_data, room=player.get_session_id())
 
     def get_game_room_num(self):
         return self._game_room_num
     
     def get_players(self):
         return self._players
-
-
-    def generate_players_bingo_card(self):
-        for player in self._players:
-            player.generate_bingo_card()
-            print(player.get_bingo_card())
-
-            response_data = {"bingo_card":player.get_bingo_card()}
-            # emit("createBingoCard", response_data, room=player.get_session_id())
 
     def player_ready(self):
         self._ready_cnt += 1
@@ -82,4 +80,7 @@ class BingoGame:
         if nickname in self._players.keys():
             player = self._players[nickname]
 
-            return player.get_bingo_card()
+            if player.get_bingo_card() != None:
+                return player.get_bingo_card()
+            else :
+                return "빙고판 nullㅠㅠ"

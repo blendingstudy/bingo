@@ -142,6 +142,7 @@ def create_game_room():
     bingo_game = BingoGame(game_room_cnt)
     bingo_game.add_player(player_a)
     bingo_game.add_player(player_b)
+    bingo_game.generate_players_bingo_card()
 
     bingo_games[game_room_cnt] = bingo_game
 
@@ -201,7 +202,7 @@ def enter_game_room(data):
     response_data = {
         "player" : bingo_game.get_my_info(nickname),
         "opp_player" : bingo_game.get_opp_info(nickname),
-        # "bingo_card" : bingo_game.get_my_bingo_card(nickname)
+        "bingo_card" : bingo_game.get_my_bingo_card(nickname)
     }
     emit("bingoGameInfo", response_data, room=request.sid)
 
@@ -212,4 +213,4 @@ def enter_game_room(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
