@@ -317,7 +317,15 @@ body {
     transition: background-color 0.3s ease;
 }
 
-.bingo-button:hover {
+.user .bingo-button:disabled{
+    background-color: #ff4e4e;
+}
+
+.user .bingo-button:disabled:hover{
+    background-color: #ff0000;
+}
+
+.user .bingo-button:hover {
     background-color: #3f5d99;
 }
 

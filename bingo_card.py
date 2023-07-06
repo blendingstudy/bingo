@@ -2,6 +2,8 @@ import random
 
 class BingoCard:
 
+    BINGO_MAX_NUMBER = 99
+
     def __init__(self):
         self.card = [[0] * 5 for _ in range(5)]  # 빙고판
         self.check = [[0] * 5 for _ in range(5)]  # 빙고판 체크
@@ -9,7 +11,7 @@ class BingoCard:
         self.create_card()
 
     def create_card(self):
-        numbers = random.sample(range(1, 100), 25)  # 1부터 50까지 중복없이 25개의 숫자를 선택
+        numbers = random.sample(range(1, BingoCard.BINGO_MAX_NUMBER+1), 25)  # 1부터 50까지 중복없이 25개의 숫자를 선택
         for i in range(5):
             for j in range(5):
                 self.card[i][j] = numbers[i * 5 + j]

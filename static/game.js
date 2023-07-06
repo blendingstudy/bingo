@@ -1,4 +1,4 @@
-const MAX_NUM = 30;
+const MAX_NUM = 99;
 const BINGO_SIZE = 5;
 const MAX_BALLS_DISPLAYED = 5;
 const BOARD_SIZE = BINGO_SIZE * BINGO_SIZE;
@@ -6,6 +6,10 @@ const MIN_BINGO_LINES = 2;
 
 let myBingoCardCells;
 let oppBingoCardCells;
+let gameOver = false;
+
+const bingoButton = document.getElementById("my-bingo-button")
+console.log(bingoButton)
 
 const socket = io() // 웹소켓 초기화
 const gameRoomNum = Number(localStorage.getItem("gameRoomNum")) // 게임방 번호
@@ -67,14 +71,16 @@ socket.on("bingoGameInfo", function(data) {
 // 랜덤 숫자 발표
 // 내 빙고판에 빙고 체크
 socket.on("generateRandomNumber", function(data) {
-    console.log(data)
-    const ball = data.num
-    let ballColor = getRandomColor()
-    displayBall('.ball-container', ball, ballColor);
-    displayBall('.recent-balls', ball, ballColor);
-
-    if(data.isChecked){
-        checkBingo(data.x, data.y, myBingoCardCells)
+    if(!gameOver){
+        console.log(data)
+        const ball = data.num
+        let ballColor = getRandomColor()
+        displayBall('.ball-container', ball, ballColor);
+        displayBall('.recent-balls', ball, ballColor);
+    
+        if(data.isChecked){
+            checkBingo(data.x, data.y, myBingoCardCells)
+        }
     }
 })
 
@@ -85,36 +91,43 @@ socket.on("oppCheckBingoCell", function(data) {
 })
 
 // 빙고 버튼 클릭
-function clickBingoButton(){
-    console.log("빙고!!!!!!!")
+function clickBingoButton() {
+    console.log("빙고!!!!!!!");
 
     const data = {
-        "gameRoomNum" : gameRoomNum,
-        "nickname" : nickname
-    }
+        "gameRoomNum": gameRoomNum,
+        "nickname": nickname
+    };
 
-    socket.emit("bingo", data)
+    socket.emit("bingo", data);
 }
 
-// 빙고 게임 결과
+// 빙고버튼 클릭 결과
 socket.on("bingoGameResult", function(data) {
-    console.log(data)
-})
+    console.log(data);
 
+    if (data.result === false) {
+        bingoButton.disabled = true; // 버튼 비활성화
+        bingoButton.classList.add('disabled');
+        setTimeout(function() {
+            bingoButton.disabled = false; // 5초 후 버튼 활성화
+            bingoButton.classList.remove('disabled');
+        }, 5000);
+    }
+});
+
+// 게임 종료
 socket.on("bingoGameOver", function(data) {
+    gameOver = true
+
     console.log(data)
 
     const isWin = data.isWin
 
-    // if(isWin){
-    //     alert("축하합니다! 이겼습니다!")
-    // }
-    // else{
-    //     alert("아쉽게도 졌습니다ㅠㅠ 다음에 다시 도전해보세요!")
-    // }
-
     openModal(isWin)
 })
+
+
 
 function checkBingo(x, y, bingoCardCells){
     const location = Number(x * 5) + Number(y)
