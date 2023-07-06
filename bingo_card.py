@@ -2,24 +2,17 @@ import random
 
 class BingoCard:
 
-    def create_card(self):
-        numbers = random.sample(range(1, 51), 25)  # 1부터 50까지 중복없이 25개의 숫자를 선택
-        for i in range(5):
-            for j in range(5):
-                self.card[i][j] = numbers[i * 5 + j]
-
-
     def __init__(self):
         self.card = [[0] * 5 for _ in range(5)]  # 빙고판
         self.check = [[0] * 5 for _ in range(5)]  # 빙고판 체크
 
         self.create_card()
 
-    def get_card(self):
-        return self.card
-
-    def get_check(self):
-        return self.check
+    def create_card(self):
+        numbers = random.sample(range(1, 51), 25)  # 1부터 50까지 중복없이 25개의 숫자를 선택
+        for i in range(5):
+            for j in range(5):
+                self.card[i][j] = numbers[i * 5 + j]
 
     def check_number(self, number):
         for i in range(5):
@@ -64,3 +57,9 @@ class BingoCard:
             for j in range(5):
                 print(f'{self.check[i][j]:2}', end=' ')
             print()
+            
+    def get_card(self):
+        return self.card
+
+    def get_check(self):
+        return self.check

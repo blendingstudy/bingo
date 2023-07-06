@@ -50,20 +50,19 @@ def loginApi():
     data = request.get_json()
 
     # json 데이터에서 'username'값 가져옴
-    nickname = data.get("username")
-    print(f"로그인 시도: {nickname} - 세션id: {session.sid}")
+    nickname = data.get("nickname")
 
     # 이미 로그인된 유저인지 확인
     if nickname in client_sessions.keys():
-        print(f"이미 로그인된 유저: {nickname}")
+        print(f"already signin user(이미 가입된 유저): {nickname}")
     else: 
         # 새로운 유저면, 등록
         client_sessions[nickname] = User(nickname)
-        print(f"로그인 성공: {nickname}")
+        print(f"new user login success(로그인 성공): {nickname}")
 
-    print('현재 접속된 유저:')
+    print('current signin user(현재 접속된 유저):')
     for nickname in client_sessions.keys():
-        print(f"유저 ID: {nickname}")
+        print(f"nickname(유저 ID): {nickname}")
     print('Total number of users:', len(client_sessions))
 
     # 응답
@@ -77,16 +76,14 @@ def userInfo():
     # query string으로부터 데이터 가져옴
     nickname = request.args.get('nickname')
 
-    print(f"유저정보 요청 시도: {nickname}")
-
     # 등록된 유저이면, 해당 유저정보 반환
     if nickname in client_sessions.keys():
-        userInfo = client_sessions[nickname]
-        print("유저정보 발견:", userInfo)
-        response = {'nickname': userInfo.get_nickname(), 'record': userInfo.get_record()}
+        user = client_sessions[nickname]
+        print("find user info(유저정보 발견):", user)
+        response = {'nickname': user.get_nickname(), 'record': user.get_record()}
         return jsonify(response)
     else:
-        print("유저정보 발견 실패")
+        print("fail to find user info(유저정보 발견 실패)")
         error_message = {'error': '유저정보 발견 실패.'}
         return jsonify(error_message), 500
 
@@ -108,7 +105,7 @@ def on_connect():
 def on_disconnect():
     print('Client disconnected')
 
-# [SOCKET] ready
+# [SOCKET] waiting
 # 게임대기
 @socketio.on('waiting', namespace='/')
 def ready(data):
@@ -117,13 +114,11 @@ def ready(data):
     print(f"game ready: {nickname}, sid: {request.sid}")
 
     if nickname not in client_sessions.keys():
-        print("유저정보 발견 실패")
-        error_message = {'error': '유저정보 발견 실패.'}
-        return jsonify(error_message), 500
+        print("fail to find user(유저정보 발견 실패)")
+        return
 
     # 게임대기를 요청한 유저를 대기리스트(큐)에 추가.
     player = client_sessions[nickname]
-    player.set_sid(request.sid)
     waiting_queue.put(player)
 
     # 큐에 2명 이상이 들어가면 게임 생성.
@@ -165,10 +160,9 @@ def start_game(data):
 
     game_room_num = data["game_room_num"]
     bingo_game = bingo_games[game_room_num]
-    print(f"----bingoGame! {bingo_game}")
     
+    # 모든 플레이어를 게임페이지로 이동시키기
     for user in bingo_game.get_players().values():
-        print("게임방으로 페이지 이동 요청")
         emit("moveGamePage", room=user.get_sid())
 
 # [SOCKET] resetSID
@@ -178,21 +172,15 @@ def reset_sid(data):
 
     nickname = data["nickname"]
     if nickname in client_sessions.keys():
-        userInfo = client_sessions[nickname]
-        userInfo.set_sid(request.sid)
-        print("sid 바꿈")
+        user = client_sessions[nickname]
+        user.set_sid(request.sid)
 
 # [SOCKET] enterGameRoom
 # 플레이어가 게임방에 들어왔음을 알림
 @socketio.on("enterGameRoom", namespace='/')
 def enter_game_room(data):
 
-    # print("플레이어 들어옴", data)
-
     game_room_num = data["gameRoomNum"]
-
-    print("게임방 번호", game_room_num, type(game_room_num))
-    print(bingo_games.keys())
     bingo_game = bingo_games[game_room_num]
 
     bingo_game.player_ready()

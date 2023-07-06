@@ -105,14 +105,14 @@ socket.on("bingoGameOver", function(data) {
 
     const isWin = data.isWin
 
-    if(isWin){
-        alert("축하합니다! 이겼습니다!")
-    }
-    else{
-        alert("아쉽게도 졌습니다ㅠㅠ 다음에 다시 도전해보세요!")
-    }
+    // if(isWin){
+    //     alert("축하합니다! 이겼습니다!")
+    // }
+    // else{
+    //     alert("아쉽게도 졌습니다ㅠㅠ 다음에 다시 도전해보세요!")
+    // }
 
-    window.location.href = '/mypage';
+    openModal(isWin)
 })
 
 function checkBingo(x, y, bingoCardCells){
@@ -207,6 +207,26 @@ function displayBall(selector, ball, color) {
 function getRandomColor() {
     const colors = ["#b5c4e0", "#879ebf", "#d6d1e0", "#aebfd9", "#c4ccd9"]; // Change these to your preferred colors
     return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function openModal(isUserVictory) {
+    let modal = document.getElementById("gameOverModal");
+    let modalHeader = document.getElementById("gameOverModalHeader");
+    let modalBody = document.getElementById("gameOverModalBody");
+
+    modal.style.display = "block";
+
+    if (isUserVictory) {
+        modalHeader.textContent = "승리";
+        modalBody.textContent = "오늘의 행운아는 바로 당신!";
+    } else {
+        modalHeader.textContent = "패배";
+        modalBody.textContent = "괜찮아요, 다음에 이기면 되죠!";
+    }
+}
+
+function moveMypage(){
+    window.location.href = '/mypage';
 }
 
 // function checkBingo(container) {

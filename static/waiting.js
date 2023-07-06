@@ -6,7 +6,16 @@ let socket = io();
 let gameRoomNum;
 
 getUserInfo()
-ready()
+resetSID()
+waiting()
+
+function resetSID(){
+    const data = {
+        "nickname" : userNickname
+    }
+    
+    socket.emit("resetSID", data)
+}
 
 function getUserInfo(){
     console.log("유저정보 요청 시도:", userNickname)
@@ -34,7 +43,7 @@ function getUserInfo(){
 
 }
 
-function ready(){
+function waiting(){
     console.log("게임 준비 시도:", userNickname)
 
     const data = {"nickname" : userNickname}

@@ -19,6 +19,38 @@ class BingoGame:
 
         self.generate_players_bingo_card()
 
+    # 플레이어 추가
+    def add_player(self, player):
+        self._players[player.get_nickname()] = player
+
+    # 플레이어들의 빙고판 생성
+    def generate_players_bingo_card(self):
+        for player in self._players.values():
+            player.generate_bingo_card()
+            # print("crate bingo card: ", player.get_bingo_card())
+
+    def player_ready(self):
+        self._ready_cnt += 1
+
+    # 모든 플레이어가 게임방에 들어왔는지 확인
+    def is_every_player_ready(self):
+        # 모든 플레이어가 게임방에 들어왔다면
+        if(self._ready_cnt == len(self._players)):
+            return True
+        else:
+            return False
+
+    # 게임 시작
+    def start_game(self):
+        print("-----bingo game start!!-----")
+
+        if len(self._players) < 2:
+            raise ValueError("Error: Not enough players to start the game.")
+
+        #2초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
+        self._scheduler.enter(0, 1, self.generate_random_number, ())  # 함수 호출 시작
+        self._scheduler.run()
+
     def generate_random_number(self):
         # 1~50사이 중복없이 랜덤 숫자 발표
         number = random.sample([x for x in range(1, 51) if x not in  self._random_numbers], 1)[0]
@@ -53,6 +85,7 @@ class BingoGame:
 
         return result
 
+    # 게임 끝
     def game_over(self, winner):
         self._game_over = True
 
@@ -64,44 +97,13 @@ class BingoGame:
                 player.lose()
                 emit("bingoGameOver", {"isWin": False}, room=player.get_sid())
 
-    def add_player(self, player):
-        self._players[player.get_nickname()] = player
-
-    def start_game(self):
-        print("-----bingo game start!!-----")
-
-        if len(self._players) < 2:
-            raise ValueError("Error: Not enough players to start the game.")
-
-        #2초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
-        self._scheduler.enter(0, 1, self.generate_random_number, ())  # 함수 호출 시작
-        self._scheduler.run()
-        
-    def generate_players_bingo_card(self):
-        for player in self._players.values():
-            player.generate_bingo_card()
-            # print("crate bingo card: ", player.get_bingo_card())
-
     def get_game_room_num(self):
         return self._game_room_num
     
     def get_players(self):
         return self._players
-
-    def player_ready(self):
-        self._ready_cnt += 1
-
-    def broadcast(self, id, data):
-        for player in self._players.values():
-            emit(id, data, room=player.get_sid())
-
-    def is_every_player_ready(self):
-        # 모든 플레이어가 게임방에 들어왔다면
-        if(self._ready_cnt == len(self._players)):
-            return True
-        else:
-            return False
         
+    # 내 정보
     def get_my_info(self, nickname):
         if nickname in self._players.keys():
             player = self._players[nickname]
@@ -113,6 +115,7 @@ class BingoGame:
 
             return response_data
         
+    # 상대 플레이어 정보
     def get_opp_info(self, nickname):
         for key in self._players.keys():
             if(key != nickname):
@@ -124,7 +127,8 @@ class BingoGame:
                 }
 
                 return response_data
-            
+
+    # 내 빙고판  
     def get_my_bingo_card(self, nickname):
         if nickname in self._players.keys():
             player = self._players[nickname]

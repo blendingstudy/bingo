@@ -13,7 +13,7 @@ document.getElementById('login-button').addEventListener('click', function() {
     // socket.emit('login', {nickname: userNickname});
 
     const data = {
-        username: userNickname,
+        "nickname": userNickname,
     };
 
     fetch("http://localhost:5000/login", {
