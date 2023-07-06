@@ -3,6 +3,7 @@ const BINGO_SIZE = 5;
 const MAX_BALLS_DISPLAYED = 5;
 const BOARD_SIZE = BINGO_SIZE * BINGO_SIZE;
 const MIN_BINGO_LINES = 2;
+
 let myBingoCardCells;
 let oppBingoCardCells;
 

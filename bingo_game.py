@@ -53,7 +53,7 @@ class BingoGame:
 
     def generate_random_number(self):
         # 1~50사이 중복없이 랜덤 숫자 발표
-        number = random.sample([x for x in range(1, 51) if x not in  self._random_numbers], 1)[0]
+        number = random.sample([x for x in range(1, 100) if x not in  self._random_numbers], 1)[0]
         self._random_numbers.append(number)
 
         # 내 빙고판에 숫자가 있는지 확인.
@@ -71,7 +71,7 @@ class BingoGame:
 
         # 50개 다 발표하면 종료 || 게임이 종료되면
         # 50개로 수정해야 함!!
-        if len(self._random_numbers) == 50 or self._game_over:
+        if len(self._random_numbers) == 100 or self._game_over:
             return
         else:
             self._scheduler.enter(2, 1, self.generate_random_number, ())

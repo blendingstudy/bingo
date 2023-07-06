@@ -9,7 +9,7 @@ class BingoCard:
         self.create_card()
 
     def create_card(self):
-        numbers = random.sample(range(1, 51), 25)  # 1부터 50까지 중복없이 25개의 숫자를 선택
+        numbers = random.sample(range(1, 100), 25)  # 1부터 50까지 중복없이 25개의 숫자를 선택
         for i in range(5):
             for j in range(5):
                 self.card[i][j] = numbers[i * 5 + j]
