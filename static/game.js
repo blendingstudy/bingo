@@ -3,7 +3,8 @@ const BINGO_SIZE = 5;
 const MAX_BALLS_DISPLAYED = 5;
 const BOARD_SIZE = BINGO_SIZE * BINGO_SIZE;
 const MIN_BINGO_LINES = 2;
-let bingoCardCells;
+let myBingoCardCells;
+let oppBingoCardCells;
 
 const socket = io() // 웹소켓 초기화
 const gameRoomNum = Number(localStorage.getItem("gameRoomNum")) // 게임방 번호
@@ -57,8 +58,9 @@ socket.on("bingoGameInfo", function(data) {
     displayBoard('.user .bingo-board', bingoCard);
     displayBoard('.opponent .bingo-board', null);
 
-    bingoCardCells = document.querySelectorAll(".user .bingo-board .cell")
-    console.log(bingoCardCells)
+    myBingoCardCells = document.querySelectorAll(".user .bingo-board .cell")
+    oppBingoCardCells = document.querySelectorAll(".opponent .bingo-board .cell")
+    console.log(myBingoCardCells)
     
     // let board = [...container.querySelectorAll('.cell')].map(cell => cell.classList.contains('called'));
 })
@@ -72,12 +74,31 @@ socket.on("generateRandomNumber", function(data) {
     displayBall('.recent-balls', ball, ballColor);
 
     if(data.isChecked){
-        const location = Number(data.x * 5) + Number(data.y)
-        console.log("체크! " + location)
+        checkBingo(data.x, data.y, myBingoCardCells)
+        // const location = Number(data.x * 5) + Number(data.y)
+        // console.log("체크! " + location)
         
+        // console.log(bingoCardCells[location])
+        // const cell = bingoCardCells[location]
         // cell.classList.add('called');
     }
 })
+
+// 상대방 빙고판에 빙고 체크
+socket.on("oppCheckBingoCell", function(data) {
+    console.log(data)
+    checkBingo(data.x, data.y, oppBingoCardCells)
+})
+
+function checkBingo(x, y, bingoCardCells){
+    const location = Number(x * 5) + Number(y)
+        console.log("체크! " + location)
+        
+        console.log(bingoCardCells[location])
+        const cell = bingoCardCells[location]
+        cell.classList.add('called');
+}
+
 
 function initializeOwnProfile(nickname, record) {
     const ownProfileBox = document.querySelector('.user .profile-section1');

@@ -28,6 +28,13 @@ class BingoGame:
             response_data = {"num":number, "isChecked":isChecked, "x":x, "y":y}
             emit("generateRandomNumber", response_data, room=player.get_session_id())
 
+            #내 빙고판에 숫자가 있으면 상대방에게 알려줘야함.
+            if isChecked:
+                for opp in self._players.values():
+                    if opp != player :
+                        response_data = {"x": x, "y": y}
+                        emit("oppCheckBingoCell", response_data, room=opp.get_session_id())
+
         # 50개 다 발표하면 종료
         # 50개로 수정해야 함!!
         if len(self._random_numbers) == 15:
