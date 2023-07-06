@@ -4,20 +4,20 @@ from bingo_card import BingoCard
 class User:
 
     def __init__(self, nickname):
-        self._nickname = nickname
-        self._bingo_card = None
+        self.nickname = nickname
+        self.bingo_card = None
         self._sid = None
         self._record = {'win': 0, 'lose': 0}
 
 
     def get_nickname(self):
-        return self._nickname
+        return self.nickname
 
     def get_record(self):
         return self._record
 
     def get_bingo_card(self):
-        return self._bingo_card.get_card()
+        return self.bingo_card.get_card()
 
     def get_sid(self):
         return self._sid
@@ -32,11 +32,11 @@ class User:
         self._record['lose'] += 1
 
     def generate_bingo_card(self):
-        self._bingo_card = BingoCard()
+        self.bingo_card = BingoCard()
 
     def check_number(self, number):
-        return self._bingo_card.check_number(number)
+        return self.bingo_card.check_number(number)
 
     def check_bingo(self):
-        return self._bingo_card.check_bingo()
+        return self.bingo_card.check_bingo()
 
