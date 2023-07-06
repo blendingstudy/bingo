@@ -15,6 +15,7 @@ class BingoGame:
         self._ready_cnt = 0
         self._scheduler = sched.scheduler(time.time, time.sleep)
         self._random_numbers = []
+        self._game_over = False
 
         self.generate_players_bingo_card()
 
@@ -23,27 +24,45 @@ class BingoGame:
         number = random.sample([x for x in range(1, 51) if x not in  self._random_numbers], 1)[0]
         self._random_numbers.append(number)
 
+        # 내 빙고판에 숫자가 있는지 확인.
         for player in self._players.values():
             isChecked, x, y = player.check_number(number)
             response_data = {"num":number, "isChecked":isChecked, "x":x, "y":y}
-            emit("generateRandomNumber", response_data, room=player.get_session_id())
+            emit("generateRandomNumber", response_data, room=player.get_sid())
 
             #내 빙고판에 숫자가 있으면 상대방에게 알려줘야함.
             if isChecked:
                 for opp in self._players.values():
                     if opp != player :
                         response_data = {"x": x, "y": y}
-                        emit("oppCheckBingoCell", response_data, room=opp.get_session_id())
+                        emit("oppCheckBingoCell", response_data, room=opp.get_sid())
 
-        # 50개 다 발표하면 종료
+        # 50개 다 발표하면 종료 || 게임이 종료되면
         # 50개로 수정해야 함!!
-        if len(self._random_numbers) == 15:
+        if len(self._random_numbers) == 50 or self._game_over:
             return
         else:
             self._scheduler.enter(2, 1, self.generate_random_number, ())
 
-        
+    # 빙고가 됐는지 확인
+    def check_bingo(self, player):
+        result = player.check_bingo()
 
+        if result:
+            self.game_over(player)
+
+        return result
+
+    def game_over(self, winner):
+        self._game_over = True
+
+        for player in self._players.values():
+            if player == winner:
+                winner.win()
+                emit("bingoGameOver", {"isWin": True}, room=player.get_sid())
+            else:
+                player.lose()
+                emit("bingoGameOver", {"isWin": False}, room=player.get_sid())
 
     def add_player(self, player):
         self._players[player.get_nickname()] = player
@@ -54,7 +73,7 @@ class BingoGame:
         if len(self._players) < 2:
             raise ValueError("Error: Not enough players to start the game.")
 
-        #3초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
+        #2초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
         self._scheduler.enter(0, 1, self.generate_random_number, ())  # 함수 호출 시작
         self._scheduler.run()
         
@@ -71,6 +90,10 @@ class BingoGame:
 
     def player_ready(self):
         self._ready_cnt += 1
+
+    def broadcast(self, id, data):
+        for player in self._players.values():
+            emit(id, data, room=player.get_sid())
 
     def is_every_player_ready(self):
         # 모든 플레이어가 게임방에 들어왔다면

@@ -123,7 +123,7 @@ def ready(data):
 
     # 게임대기를 요청한 유저를 대기리스트(큐)에 추가.
     player = client_sessions[nickname]
-    player.set_session_id(request.sid)
+    player.set_sid(request.sid)
     waiting_queue.put(player)
 
     # 큐에 2명 이상이 들어가면 게임 생성.
@@ -150,12 +150,12 @@ def create_game_room():
 
     #플레이어 a에겐 b 정보 건내줌
     response_data = {"reader": True, "game_room_num": bingo_game.get_game_room_num(), "opp_nickname": player_b.get_nickname(), "opp_record": player_b.get_record()}
-    emit('readyGame', response_data, room=player_a.get_session_id())
-    print(f"send to a-sid: {player_a.get_session_id()}")
+    emit('readyGame', response_data, room=player_a.get_sid())
+    print(f"send to a-sid: {player_a.get_sid()}")
     #플레이어 b에겐 a 정보 건내줌
     response_data = {"reader": False, "game_room_num": bingo_game.get_game_room_num(), "opp_nickname": player_a.get_nickname(), "opp_record": player_a.get_record()}
-    emit('readyGame', response_data, room=player_b.get_session_id())
-    print(f"send to b-sid: {player_b.get_session_id()}")
+    emit('readyGame', response_data, room=player_b.get_sid())
+    print(f"send to b-sid: {player_b.get_sid()}")
 
 
 # [SOCKET] startGame
@@ -169,7 +169,7 @@ def start_game(data):
     
     for user in bingo_game.get_players().values():
         print("게임방으로 페이지 이동 요청")
-        emit("moveGamePage", room=user.get_session_id())
+        emit("moveGamePage", room=user.get_sid())
 
 # [SOCKET] resetSID
 # 유저의 sid 다시 설정
@@ -179,7 +179,7 @@ def reset_sid(data):
     nickname = data["nickname"]
     if nickname in client_sessions.keys():
         userInfo = client_sessions[nickname]
-        userInfo.set_session_id(request.sid)
+        userInfo.set_sid(request.sid)
         print("sid 바꿈")
 
 # [SOCKET] enterGameRoom
@@ -213,6 +213,24 @@ def enter_game_room(data):
         bingo_game.start_game()
 
 
+# 빙고 버튼 클릭.
+# 빙고가 맞으면 게임 끝
+# 아니면 계속 게임하기.
+@socketio.on("bingo", namespace='/')
+def bingo(data):
+    print("player click bingo button!!")
+
+    game_room_num = data["gameRoomNum"]
+    bingo_game = bingo_games[game_room_num]
+
+    nickname = data["nickname"]
+    if nickname in client_sessions.keys():
+        user = client_sessions[nickname]
+        result = bingo_game.check_bingo(user)
+
+        response_data = {"result":result}
+        emit("bingoGameResult", response_data, room=user.get_sid())
+        
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, allow_unsafe_werkzeug=True)

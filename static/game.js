@@ -60,12 +60,11 @@ socket.on("bingoGameInfo", function(data) {
 
     myBingoCardCells = document.querySelectorAll(".user .bingo-board .cell")
     oppBingoCardCells = document.querySelectorAll(".opponent .bingo-board .cell")
-    console.log(myBingoCardCells)
-    
-    // let board = [...container.querySelectorAll('.cell')].map(cell => cell.classList.contains('called'));
+    // console.log(myBingoCardCells)
 })
 
 // 랜덤 숫자 발표
+// 내 빙고판에 빙고 체크
 socket.on("generateRandomNumber", function(data) {
     console.log(data)
     const ball = data.num
@@ -75,28 +74,54 @@ socket.on("generateRandomNumber", function(data) {
 
     if(data.isChecked){
         checkBingo(data.x, data.y, myBingoCardCells)
-        // const location = Number(data.x * 5) + Number(data.y)
-        // console.log("체크! " + location)
-        
-        // console.log(bingoCardCells[location])
-        // const cell = bingoCardCells[location]
-        // cell.classList.add('called');
     }
 })
 
 // 상대방 빙고판에 빙고 체크
 socket.on("oppCheckBingoCell", function(data) {
-    console.log(data)
+    // console.log(data)
     checkBingo(data.x, data.y, oppBingoCardCells)
+})
+
+// 빙고 버튼 클릭
+function clickBingoButton(){
+    console.log("빙고!!!!!!!")
+
+    const data = {
+        "gameRoomNum" : gameRoomNum,
+        "nickname" : nickname
+    }
+
+    socket.emit("bingo", data)
+}
+
+// 빙고 게임 결과
+socket.on("bingoGameResult", function(data) {
+    console.log(data)
+})
+
+socket.on("bingoGameOver", function(data) {
+    console.log(data)
+
+    const isWin = data.isWin
+
+    if(isWin){
+        alert("축하합니다! 이겼습니다!")
+    }
+    else{
+        alert("아쉽게도 졌습니다ㅠㅠ 다음에 다시 도전해보세요!")
+    }
+
+    window.location.href = '/mypage';
 })
 
 function checkBingo(x, y, bingoCardCells){
     const location = Number(x * 5) + Number(y)
-        console.log("체크! " + location)
-        
-        console.log(bingoCardCells[location])
-        const cell = bingoCardCells[location]
-        cell.classList.add('called');
+    // console.log("체크! " + location)
+    
+    // console.log(bingoCardCells[location])
+    const cell = bingoCardCells[location]
+    cell.classList.add('called');
 }
 
 
