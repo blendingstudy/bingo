@@ -17,11 +17,17 @@ const nickname = localStorage.getItem("nickname") // 닉네임
 
 console.log("게임방 번호: " + gameRoomNum)
 console.log("닉네임: " + nickname)
-
+ 
 // sid 다시 세팅
 resetSID()
 // 게임방 입장 알림
 enterGameRoom()
+
+// 게임 페이지의 JavaScript 코드 예시
+window.onbeforeunload = function() {
+    socket.emit('out');
+};
+  
 
 function resetSID(){
     const data = {
@@ -126,8 +132,6 @@ socket.on("bingoGameOver", function(data) {
 
     openModal(isWin)
 })
-
-
 
 function checkBingo(x, y, bingoCardCells){
     const location = Number(x * 5) + Number(y)

@@ -6,30 +6,36 @@ class User:
     def __init__(self, nickname):
         self.nickname = nickname
         self.bingo_card = None
-        self._sid = None
-        self._record = {'win': 0, 'lose': 0}
-
+        self.sid = None
+        self.record = {'win': 0, 'lose': 0}
+        self.is_waiting = False
 
     def get_nickname(self):
         return self.nickname
 
     def get_record(self):
-        return self._record
+        return self.record
 
     def get_bingo_card(self):
         return self.bingo_card.get_card()
 
     def get_sid(self):
-        return self._sid
+        return self.sid
+
+    def get_is_waiting(self):
+        return self.is_waiting
 
     def set_sid(self, sid):
-        self._sid = sid
+        self.sid = sid
+
+    def set_is_waiting(self, is_waiting):
+        self.is_waiting = is_waiting
 
     def win(self):
-        self._record['win'] += 1
+        self.record['win'] += 1
 
     def lose(self):
-        self._record['lose'] += 1
+        self.record['lose'] += 1
 
     def generate_bingo_card(self):
         self.bingo_card = BingoCard()

@@ -21,7 +21,7 @@ bingo_games = {}
 game_room_cnt = 1
 
 # Matchmaking queue
-waiting_queue = Queue()
+waiting_queue = []
 
 # 로그인 페이지
 @app.route('/')
@@ -87,6 +87,7 @@ def userInfo():
         error_message = {'error': '유저정보 발견 실패.'}
         return jsonify(error_message), 500
 
+
 # [GET] /test
 # 테스트 API
 @app.route('/test', methods=['GET'])
@@ -105,6 +106,10 @@ def on_connect():
 def on_disconnect():
     print('Client disconnected')
 
+@socketio.on("out", namespace='/')
+def out():
+    print("게임 강제 종료")
+
 # [SOCKET] waiting
 # 게임대기
 @socketio.on('waiting', namespace='/')
@@ -119,18 +124,20 @@ def ready(data):
 
     # 게임대기를 요청한 유저를 대기리스트(큐)에 추가.
     player = client_sessions[nickname]
-    waiting_queue.put(player)
+    if not player.get_is_waiting():
+        player.set_is_waiting(True)
+        waiting_queue.append(player)
 
     # 큐에 2명 이상이 들어가면 게임 생성.
-    if waiting_queue.qsize() >= 2:
+    if len(waiting_queue) >= 2:
         create_game_room()
 
 
 def create_game_room():
     #플레이어 a 정보 꺼냄 -> 먼저 들어온 사람이 방장이 되어, 게임시작 권한을 갖게됨.
-    player_a = waiting_queue.get()
+    player_a = waiting_queue[0]
     #플레이어 b 정보 꺼냄
-    player_b = waiting_queue.get()
+    player_b = waiting_queue[1]
 
     #게임방 만들어야함.
     global game_room_cnt
@@ -163,6 +170,8 @@ def start_game(data):
     
     # 모든 플레이어를 게임페이지로 이동시키기
     for user in bingo_game.get_players().values():
+        waiting_queue.pop(0)
+        user.set_is_waiting(False)
         emit("moveGamePage", room=user.get_sid())
 
 # [SOCKET] resetSID
@@ -218,7 +227,7 @@ def bingo(data):
 
         response_data = {"result":result}
         emit("bingoGameResult", response_data, room=user.get_sid())
-        
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, allow_unsafe_werkzeug=True)

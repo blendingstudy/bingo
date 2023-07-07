@@ -491,3 +491,17 @@ body {
     cursor: not-allowed; /* 커서 스타일 변경 */
     /* 기타 원하는 스타일 지정 */
 }
+
+#exit-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5472b8;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#exit-button:hover {
+    background-color: #3f5d99;
+}

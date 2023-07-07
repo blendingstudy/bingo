@@ -107,7 +107,6 @@ class BingoGame:
                 emit("bingoGameOver", {"isWin": False}, room=player.get_sid())
 
 
-
     def get_game_room_num(self):
         return self.game_room_num
     
