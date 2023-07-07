@@ -7,6 +7,7 @@ import time
 from queue import Queue
 from user import User
 from bingo_game import BingoGame
+from bingo_data import BingoData
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
@@ -19,7 +20,6 @@ socketio = SocketIO(app, manage_session=False)
 client_sessions = {}
 bingo_games = {}
 GAME_ROOM_CNT = 1
-MIN_PLAYER_SIZE = 2
 
 # Matchmaking queue
 waiting_queue = []
@@ -130,9 +130,9 @@ def ready(data):
         waiting_queue.append(player)
 
     # 큐에 2명 이상이 들어가면 게임 생성.
-    global MIN_PLAYER_SIZE
-    if len(waiting_queue) >= MIN_PLAYER_SIZE:
-        create_game_room()
+    if len(waiting_queue) >= BingoData.MIN_PLAYER_SIZE:
+        bingo_game = create_game_room()
+        send_match_player_info(bingo_game)
 
 
 def create_game_room():
@@ -141,8 +141,7 @@ def create_game_room():
     global GAME_ROOM_CNT
     bingo_game = BingoGame(GAME_ROOM_CNT)
 
-    global MIN_PLAYER_SIZE
-    for i in range(MIN_PLAYER_SIZE):
+    for i in range(BingoData.MIN_PLAYER_SIZE):
         player = waiting_queue[i]
         bingo_game.add_player(player)
 
@@ -151,6 +150,9 @@ def create_game_room():
 
     GAME_ROOM_CNT += 1
 
+    return bingo_game
+
+def send_match_player_info(bingo_game):
     # 상대 플레이어 정보 전달.
     leader = True # -> 먼저 들어온 사람이 방장이 되어, 게임시작 권한을 갖게됨.
     for player in bingo_game.get_players().values():
@@ -198,10 +200,11 @@ def enter_game_room(data):
 
     # 플레이어 정보, 상대방 정보, 내 빙고판 정보 넘겨주기.
     nickname = data["nickname"]
+    player = client_sessions[nickname]
     response_data = {
-        "player" : bingo_game.get_my_info(nickname),
-        "opp_player" : bingo_game.get_opp_info(nickname),
-        "bingo_card" : bingo_game.get_my_bingo_card(nickname)
+        "player" : bingo_game.get_my_info(player),
+        "opp_player" : bingo_game.get_opp_info(player),
+        "bingo_card" : bingo_game.get_my_bingo_card(player)
     }
     emit("bingoGameInfo", response_data, room=request.sid)
 
@@ -223,10 +226,10 @@ def bingo(data):
     bingo_game = bingo_games[game_room_num]
 
     nickname = data["nickname"]
-    if nickname in client_sessions.keys():
-        result = bingo_game.check_bingo(nickname)
+    player = client_sessions[nickname]
+    if player in client_sessions.values():
+        result = bingo_game.check_bingo(player)
 
-        player = client_sessions[nickname]
         response_data = {"result":result}
         emit("bingoGameResult", response_data, room=player.get_sid())
 

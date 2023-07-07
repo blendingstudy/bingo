@@ -4,14 +4,12 @@ from flask_session import Session  # for server-side sessions
 import random
 from user import User
 from bingo_card import BingoCard
+from bingo_data import BingoData
 import threading
 import sched
 import time
 
 class BingoGame:
-
-    MAX_PLAYER_SIZE = 2
-    MIN_PLAYER_SIZE = 2
 
     def __init__(self, game_room_num):
         self.players = {}
@@ -51,18 +49,18 @@ class BingoGame:
     def start_game(self):
         print("-----bingo game start!!-----")
 
-        if len(self.players) < BingoGame.MIN_PLAYER_SIZE:
+        if len(self.players) < BingoData.MIN_PLAYER_SIZE:
             raise ValueError("Error: Not enough players to start the game.")
 
         #2초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
-        random.sample(range(1, BingoCard.BINGO_MAX_NUMBER + 1), 25) # 이유는 모르겠는데 항상 늦게 들어온 플레이어가 이길 확률이 높아서 코드 넣어봄.
+        random.sample(range(1, BingoData.BINGO_MAX_NUMBER + 1), 25) # 이유는 모르겠는데 항상 늦게 들어온 플레이어가 이길 확률이 높아서 코드 넣어봄.
         self.scheduler.enter(0, 1, self.generate_random_number, ())  # 함수 호출 시작
         self.scheduler.run()
 
 
     def generate_random_number(self):
         # 1~99사이 중복없이 랜덤 숫자 발표
-        number = random.sample([x for x in range(1, BingoCard.BINGO_MAX_NUMBER + 1) if x not in  self.random_numbers], 1)[0]
+        number = random.sample([x for x in range(1, BingoData.BINGO_MAX_NUMBER + 1) if x not in  self.random_numbers], 1)[0]
         self.random_numbers.append(number)
 
         # 내 빙고판에 숫자가 있는지 확인.
@@ -79,16 +77,16 @@ class BingoGame:
                         emit("oppCheckBingoCell", response_data, room=opp.get_sid())
 
         # 99개 다 발표하면 종료 || 게임이 종료되면
-        if len(self.random_numbers) == BingoCard.BINGO_MAX_NUMBER or self.is_game_over:
+        if len(self.random_numbers) == BingoData.BINGO_MAX_NUMBER or self.is_game_over:
             return
         else:
             self.scheduler.enter(2, 1, self.generate_random_number, ())
 
 
     # 빙고가 됐는지 확인
-    def check_bingo(self, nickname):
-        if nickname in self.players.keys():
-            player = self.players[nickname]
+    def check_bingo(self, player):
+        if player in self.players.values():
+            print("is bingo??")
             result = player.check_bingo()
 
             if result:
@@ -117,10 +115,8 @@ class BingoGame:
         return self.players
         
     # 내 정보
-    def get_my_info(self, nickname):
-        if nickname in self.players.keys():
-            player = self.players[nickname]
-
+    def get_my_info(self, player):
+        if player in self.players.values():
             response_data = {
                 "nickname" : player.get_nickname(),
                 "record" : player.get_record()
@@ -129,22 +125,20 @@ class BingoGame:
             return response_data
         
     # 상대 플레이어 정보
-    def get_opp_info(self, nickname):
-        for key in self.players.keys():
-            if(key != nickname):
-                opp_player = self.players[key]
+    def get_opp_info(self, player):
+        for opp in self.players.values():
+            if(opp != player):
 
                 response_data = {
-                    "nickname" : opp_player.get_nickname(),
-                    "record" : opp_player.get_record()
+                    "nickname" : opp.get_nickname(),
+                    "record" : opp.get_record()
                 }
 
                 return response_data
 
     # 내 빙고판  
-    def get_my_bingo_card(self, nickname):
-        if nickname in self.players.keys():
-            player = self.players[nickname]
+    def get_my_bingo_card(self, player):
+        if player in self.players.values():
 
             if player.get_bingo_card() != None:
                 return player.get_bingo_card()
