@@ -25,6 +25,8 @@ class BingoGame:
     def add_player(self, player):
         self.players[player.get_nickname()] = player
 
+    def set_players(self, players):
+        self.players = players
 
     # 플레이어들의 빙고판 생성
     def generate_players_bingo_card(self):

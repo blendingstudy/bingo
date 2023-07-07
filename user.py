@@ -27,6 +27,9 @@ class User:
     def get_is_waiting(self):
         return self.is_waiting
 
+    def get_id(self):
+        return self.id
+
     def set_sid(self, sid):
         self.sid = sid
 
