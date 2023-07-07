@@ -28,6 +28,7 @@ document.getElementById('login-button').addEventListener('click', function() {
             // 응답 데이터 처리
             console.log(data)
             localStorage.setItem('nickname', userNickname);  // Now userNickname is accessible here
+            localStorage.setItem('userId', data.user_id);
             window.location.href = '/mypage';
         })
         .catch(error => {

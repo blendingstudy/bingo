@@ -86,7 +86,6 @@ class BingoGame:
     # 빙고가 됐는지 확인
     def check_bingo(self, player):
         if player in self.players.values():
-            print("is bingo??")
             result = player.check_bingo()
 
             if result:
