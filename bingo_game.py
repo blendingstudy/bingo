@@ -8,6 +8,7 @@ from bingo_data import BingoData
 import threading
 import sched
 import time
+import mysql.connector
 
 class BingoGame:
 
@@ -104,6 +105,25 @@ class BingoGame:
             if player == winner:
                 winner.win()
                 emit("bingoGameOver", {"isWin": True}, room=player.get_sid())
+                try:
+                    conn = mysql.connector.connect(
+                        host='localhost',
+                        user='root',
+                        password='enfj3913',
+                        database='bingo'
+                    )
+                    cursor = conn.cursor()
+
+                    # Increase the win count in the database for the user_id
+                    query = "UPDATE game_member SET is_win = 1 WHERE player_id = %s and bingo_game_room_id = %s"
+                    values = (winner.get_id(), self.game_room_num, )
+                    cursor.execute(query, values)
+                    conn.commit()
+
+                    cursor.close()
+                    conn.close()
+                except mysql.connector.Error as error:
+                    print("Error while updating win count in the database:", error)
             else:
                 player.lose()
                 emit("bingoGameOver", {"isWin": False}, room=player.get_sid())

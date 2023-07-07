@@ -31,7 +31,6 @@ mysql = MySQL(app)
 client_sessions = {}
 bingo_games = {}
 game_matchs = {}
-GAME_ROOM_CNT = 1
 GAME_MATCH_CNT = 1
 
 # Matchmaking queue
@@ -206,7 +205,7 @@ def ready(data):
     # 큐에 2명 이상이 들어가면 게임 생성.
     # 큐에 2명 이상이 들어가면 게임 매칭으로 바꾸기.
     if len(waiting_queue) >= BingoData.MIN_PLAYER_SIZE:
-        send_match_player_info()
+        matching_player()
 
 
 # def create_game_room(title):
@@ -250,7 +249,7 @@ def ready(data):
 #                 # print(f"send to a-sid: {player_a.get_sid()}")
 #         leader = False
 
-def send_match_player_info():
+def matching_player():
     global GAME_MATCH_CNT
 
     game_match = GameMatch(GAME_MATCH_CNT)
@@ -292,19 +291,26 @@ def start_game(data):
         emit("moveGamePage", response_data, room=player.get_sid())
 
 def create_game_room(game_match):
+    # MySQL 데이터베이스에 게임방 생성
+    title = "빙고게임 시작"
+    cur = mysql.connection.cursor()
+    cur.execute("INSERT INTO bingo_game_room (title) VALUES (%s)", (title,))
+    mysql.connection.commit()
+    game_room_id = cur.lastrowid
+    cur.close()
+
+    # 게임 멤버 테이블에 게임룸 ID와 유저 ID 추가
+    cur = mysql.connection.cursor()
+    for player in game_match.get_players().values():
+        cur.execute("INSERT INTO game_member (bingo_game_room_id, player_id) VALUES (%s, %s)", (game_room_id, player.get_id()))
+        mysql.connection.commit()
+    cur.close()
+
     # 게임방 만들기
-    global GAME_ROOM_CNT
-    bingo_game = BingoGame(GAME_ROOM_CNT)
+    bingo_game = BingoGame(game_room_id)
     bingo_game.set_players(game_match.get_players())
-
-    # for i in range(BingoData.MIN_PLAYER_SIZE):
-    #     player = waiting_queue[i]
-    #     bingo_game.add_player(player)
-
     bingo_game.generate_players_bingo_card()
-    bingo_games[GAME_ROOM_CNT] = bingo_game
-
-    GAME_ROOM_CNT += 1
+    bingo_games[game_room_id] = bingo_game
 
     return bingo_game
 
@@ -350,7 +356,6 @@ def enter_game_room(data):
             bingo_game.start_game()
     else:
         print(f"User not found: {nickname}")
-
 
 
 # 빙고 버튼 클릭.
