@@ -18,7 +18,8 @@ socketio = SocketIO(app, manage_session=False)
 
 client_sessions = {}
 bingo_games = {}
-game_room_cnt = 1
+GAME_ROOM_CNT = 1
+MIN_PLAYER_SIZE = 2
 
 # Matchmaking queue
 waiting_queue = []
@@ -129,35 +130,36 @@ def ready(data):
         waiting_queue.append(player)
 
     # 큐에 2명 이상이 들어가면 게임 생성.
-    if len(waiting_queue) >= 2:
+    global MIN_PLAYER_SIZE
+    if len(waiting_queue) >= MIN_PLAYER_SIZE:
         create_game_room()
 
 
 def create_game_room():
-    #플레이어 a 정보 꺼냄 -> 먼저 들어온 사람이 방장이 되어, 게임시작 권한을 갖게됨.
-    player_a = waiting_queue[0]
-    #플레이어 b 정보 꺼냄
-    player_b = waiting_queue[1]
 
     #게임방 만들어야함.
-    global game_room_cnt
-    bingo_game = BingoGame(game_room_cnt)
-    bingo_game.add_player(player_a)
-    bingo_game.add_player(player_b)
+    global GAME_ROOM_CNT
+    bingo_game = BingoGame(GAME_ROOM_CNT)
+
+    global MIN_PLAYER_SIZE
+    for i in range(MIN_PLAYER_SIZE):
+        player = waiting_queue[i]
+        bingo_game.add_player(player)
+
     bingo_game.generate_players_bingo_card()
+    bingo_games[GAME_ROOM_CNT] = bingo_game
 
-    bingo_games[game_room_cnt] = bingo_game
+    GAME_ROOM_CNT += 1
 
-    game_room_cnt += 1
-
-    #플레이어 a에겐 b 정보 건내줌
-    response_data = {"reader": True, "game_room_num": bingo_game.get_game_room_num(), "opp_nickname": player_b.get_nickname(), "opp_record": player_b.get_record()}
-    emit('readyGame', response_data, room=player_a.get_sid())
-    print(f"send to a-sid: {player_a.get_sid()}")
-    #플레이어 b에겐 a 정보 건내줌
-    response_data = {"reader": False, "game_room_num": bingo_game.get_game_room_num(), "opp_nickname": player_a.get_nickname(), "opp_record": player_a.get_record()}
-    emit('readyGame', response_data, room=player_b.get_sid())
-    print(f"send to b-sid: {player_b.get_sid()}")
+    # 상대 플레이어 정보 전달.
+    leader = True # -> 먼저 들어온 사람이 방장이 되어, 게임시작 권한을 갖게됨.
+    for player in bingo_game.get_players().values():
+        for opp in bingo_game.get_players().values():
+            if opp != player:
+                response_data = {"leader": leader, "game_room_num": bingo_game.get_game_room_num(), "opp_nickname": opp.get_nickname(), "opp_record": opp.get_record()}
+                emit('readyGame', response_data, room=player.get_sid())
+                # print(f"send to a-sid: {player_a.get_sid()}")
+        leader = False
 
 
 # [SOCKET] startGame
@@ -169,10 +171,10 @@ def start_game(data):
     bingo_game = bingo_games[game_room_num]
     
     # 모든 플레이어를 게임페이지로 이동시키기
-    for user in bingo_game.get_players().values():
+    for player in bingo_game.get_players().values():
         waiting_queue.pop(0)
-        user.set_is_waiting(False)
-        emit("moveGamePage", room=user.get_sid())
+        player.set_is_waiting(False)
+        emit("moveGamePage", room=player.get_sid())
 
 # [SOCKET] resetSID
 # 유저의 sid 다시 설정
@@ -222,11 +224,11 @@ def bingo(data):
 
     nickname = data["nickname"]
     if nickname in client_sessions.keys():
-        user = client_sessions[nickname]
-        result = bingo_game.check_bingo(user)
+        result = bingo_game.check_bingo(nickname)
 
+        player = client_sessions[nickname]
         response_data = {"result":result}
-        emit("bingoGameResult", response_data, room=user.get_sid())
+        emit("bingoGameResult", response_data, room=player.get_sid())
 
 
 if __name__ == '__main__':

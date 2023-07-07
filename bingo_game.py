@@ -55,6 +55,7 @@ class BingoGame:
             raise ValueError("Error: Not enough players to start the game.")
 
         #2초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
+        random.sample(range(1, BingoCard.BINGO_MAX_NUMBER + 1), 25) # 이유는 모르겠는데 항상 늦게 들어온 플레이어가 이길 확률이 높아서 코드 넣어봄.
         self.scheduler.enter(0, 1, self.generate_random_number, ())  # 함수 호출 시작
         self.scheduler.run()
 
@@ -85,13 +86,15 @@ class BingoGame:
 
 
     # 빙고가 됐는지 확인
-    def check_bingo(self, player):
-        result = player.check_bingo()
+    def check_bingo(self, nickname):
+        if nickname in self.players.keys():
+            player = self.players[nickname]
+            result = player.check_bingo()
 
-        if result:
-            self.game_over(player)
+            if result:
+                self.game_over(player)
 
-        return result
+            return result
 
 
     # 게임 끝

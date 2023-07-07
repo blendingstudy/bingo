@@ -68,7 +68,7 @@ socket.on('readyGame', function(data) {
         </div>
     `;
 
-    if(data.reader){
+    if(data.leader){
         start_buttom = document.getElementById("ready-button")
         start_buttom.disabled  = false
     }
