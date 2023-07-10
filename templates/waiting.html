@@ -4,6 +4,106 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../static/style.css">
+    <style>
+        /* body {
+            background-color: #f8f8f8;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #waiting {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f8f8;
+        }
+
+        #waiting-page {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .countdown-section {
+            margin-bottom: 20px;
+        }
+
+        #countdown-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #ccc;
+            border-radius: 5px;
+        }
+
+        .profiles-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .opponent-profiles {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .profile-box {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .opponent-profile {
+            flex: 0 0 14%;
+            margin-right: 10px;
+        }
+
+        .own-profile {
+            flex: 0 0 100%;
+        }
+
+        .vs-text {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-picture {
+            width: 80px;
+            height: 80px;
+            background-color: #ddd;
+            border-radius: 50%;
+            margin: 0 auto;
+        }
+
+        .profile-info {
+            margin-top: 10px;
+        }
+
+        h2, h3, p {
+            margin: 0;
+        }
+
+        #ready-button {
+            display: block;
+            margin: 0 auto;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        } */
+    </style>
     <script src="https://cdn.socket.io/4.2.0/socket.io.js"></script>
     <script src="/static/waiting.js"></script>
     <title>Waiting - Online Bingo Game</title>
@@ -15,21 +115,38 @@
             <div id="countdown-bar"></div>
         </div>
         <div class="profiles-section">
-            <div class="profile-box own-profile">
-                <div class="profile-picture">
-                    <!-- Profile picture will go here -->
+            <div class="opponent-profiles">
+                <div class="profile-box opponent-profile">
+                    <!-- Opponent's profile 1 will go here -->
                 </div>
-                <div class="profile-info">
-                    <h2 id="own-nickname">Nickname</h2>
-                    <h3>전적</h3>
-                    <p id="own-record">0승 0패</p>
+                <div class="profile-box opponent-profile">
+                    <!-- Opponent's profile 2 will go here -->
+                </div>
+                <div class="profile-box opponent-profile">
+                    <!-- Opponent's profile 3 will go here -->
+                </div>
+                <div class="profile-box opponent-profile">
+                    <!-- Opponent's profile 4 will go here -->
+                </div>
+                <div class="profile-box opponent-profile">
+                    <!-- Opponent's profile 5 will go here -->
+                </div>
+                <div class="profile-box opponent-profile">
+                    <!-- Opponent's profile 6 will go here -->
                 </div>
             </div>
 
             <div class="vs-text">VS</div>
 
-            <div class="profile-box opponent-profile">
-                <!-- Opponent's profile will go here -->
+            <div class="profile-box own-profile">
+                <div class="profile-picture">
+                    <!-- Your profile picture will go here -->
+                </div>
+                <div class="profile-info">
+                    <h2 id="own-nickname">Your Nickname</h2>
+                    <h3>전적</h3>
+                    <p id="own-record">0승 0패</p>
+                </div>
             </div>
         </div>
         <div class="ready-button-section">

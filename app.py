@@ -34,7 +34,7 @@ game_matchs = {}
 GAME_MATCH_CNT = 1
 
 # Matchmaking queue
-waiting_queue = []
+waiting_queue = Queue()
 
 # 로그인 페이지
 @app.route('/')
@@ -198,77 +198,48 @@ def ready(data):
 
     # 게임대기를 요청한 유저를 대기리스트(큐)에 추가.
     player = client_sessions[nickname]
-    if not player.get_is_waiting():
-        player.set_is_waiting(True)
-        waiting_queue.append(player)
+    # if not player.get_is_waiting():
+    #     player.set_is_waiting(True)
+    waiting_queue.put(player)
 
-    # 큐에 2명 이상이 들어가면 게임 생성.
-    # 큐에 2명 이상이 들어가면 게임 매칭으로 바꾸기.
-    if len(waiting_queue) >= BingoData.MIN_PLAYER_SIZE:
-        matching_player()
+    # 큐에 2명 이상이 들어가면 게임 매칭.
+    # if waiting_queue.qsize() >= BingoData.MIN_PLAYER_SIZE:
+    matching_player()
 
-
-# def create_game_room(title):
-#     # MySQL 데이터베이스에 게임방 생성
-#     cur = mysql.connection.cursor()
-#     cur.execute("INSERT INTO bingo_game_room (title) VALUES (%s)", (title,))
-#     mysql.connection.commit()
-#     game_room_id = cur.lastrowid
-#     cur.close()
-
-#     # 게임방 만들기
-#     global GAME_ROOM_CNT
-#     bingo_game = BingoGame(game_room_id)
-
-#     for i in range(BingoData.MIN_PLAYER_SIZE):
-#         player = waiting_queue[i]
-#         bingo_game.add_player(player)
-
-#     bingo_game.generate_players_bingo_card()
-#     bingo_games[game_room_id] = bingo_game
-
-#     # 게임 멤버 테이블에 게임룸 ID와 유저 ID 추가
-#     # cur = mysql.connection.cursor()
-#     # for player in bingo_game.get_players().values():
-#     #     cur.execute("INSERT INTO game_member (game_member_id, player_id) VALUES (%s, %s)", (game_room_id, player.get_id()))
-#     #     mysql.connection.commit()
-#     # cur.close()
-
-#     GAME_ROOM_CNT += 1
-
-#     return bingo_game
-
-# def send_match_player_info(bingo_game):
-#     # 상대 플레이어 정보 전달.
-#     leader = True # -> 먼저 들어온 사람이 방장이 되어, 게임시작 권한을 갖게됨.
-#     for player in bingo_game.get_players().values():
-#         for opp in bingo_game.get_players().values():
-#             if opp != player:
-#                 response_data = {"leader": leader, "game_room_num": bingo_game.get_game_room_num(), "opp_nickname": opp.get_nickname(), "opp_record": opp.get_record()}
-#                 emit('readyGame', response_data, room=player.get_sid())
-#                 # print(f"send to a-sid: {player_a.get_sid()}")
-#         leader = False
 
 def matching_player():
     global GAME_MATCH_CNT
+    player = waiting_queue.get()
 
+    if GAME_MATCH_CNT-1 in game_matchs.keys():
+        prev_game_match = game_matchs[GAME_MATCH_CNT-1]
+        if prev_game_match.num_of_wating_player() < BingoData.MAX_PLAYER_SIZE and not prev_game_match.is_match_complete():
+            print("prev_matcing add player!!!!!")
+            prev_game_match.add_player(player)
+            temp(player, prev_game_match)
+            return
+
+    print("new matching !!!!!")
     game_match = GameMatch(GAME_MATCH_CNT)
-    for i in range(BingoData.MIN_PLAYER_SIZE):
-        player = waiting_queue[i]
-        game_match.add_player(player)
+    game_match.add_player(player)
     game_matchs[GAME_MATCH_CNT] = game_match
 
     GAME_MATCH_CNT += 1
 
-    # 상대 플레이어 정보 전달.
-    leader = True # -> 먼저 들어온 사람이 방장이 되어, 게임시작 권한을 갖게됨.
-    for player in game_match.get_players().values():
-        for opp in game_match.get_players().values():
-            if opp != player:
-                response_data = {"leader": leader, "game_match_num": game_match.get_id(), "opp_nickname": opp.get_nickname(), "opp_record": opp.get_record()}
-                emit('gameMatchComplete', response_data, room=player.get_sid())
-                # print(f"send to a-sid: {player_a.get_sid()}")
-        leader = False
+
+def temp(player, game_match):
+    # 새로운 플레이어의 정보 전달
+    for opp in game_match.get_players().values():
+        if opp != player:
+            response_data = {"leader": game_match.get_leader() == opp, "game_match_num": game_match.get_id(), "opp_nickname": player.get_nickname(), "opp_record": player.get_record(), "idx": game_match.num_of_wating_player()}
+            emit('newPlayerMatched', response_data, room=opp.get_sid())
+    
+    # 새로운 플레이어에게 이전 매칭된 플레이어 정보 전달
+    for opp in game_match.get_players().values():
+        if opp != player:
+            response_data = {"leader": game_match.get_leader() == player, "game_match_num": game_match.get_id(), "opp_nickname": opp.get_nickname(), "opp_record": opp.get_record()}
+            emit('gameMatchComplete', response_data, room=player.get_sid())
+            # print(f"send to a-sid: {player_a.get_sid()}")
 
 
 # [SOCKET] startGame
@@ -279,6 +250,8 @@ def start_game(data):
     game_match_num = data["game_match_num"]
     game_match = game_matchs[game_match_num]
 
+    game_match.game_start()
+
     # 여기서 게임 만들기.
     bingo_game = create_game_room(game_match)
 
@@ -286,7 +259,6 @@ def start_game(data):
     
     # 모든 플레이어를 게임페이지로 이동시키기
     for player in bingo_game.get_players().values():
-        waiting_queue.pop(0)
         player.set_is_waiting(False)
         emit("moveGamePage", response_data, room=player.get_sid())
 

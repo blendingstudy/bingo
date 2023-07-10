@@ -116,13 +116,14 @@ function startCountdown() {
     }, 1000); // 0.1초마다 실행
 }
 
+let opp_player_idx = 0
 socket.on('gameMatchComplete', function(data) {
 
     console.log(data)
 
     // 상대 플레이어 화면에 표시
     opp_player = document.getElementsByClassName("profile-box opponent-profile")
-    opp_player.item(0).innerHTML = `
+    opp_player.item(opp_player_idx).innerHTML = `
         <div class="profile-picture">
             <!-- Profile picture will go here -->
         </div>
@@ -132,6 +133,7 @@ socket.on('gameMatchComplete', function(data) {
             <p>${data.opp_record.win}승 ${data.opp_record.lose}패</p>
         </div>
     `;
+    opp_player_idx++
 
     if(data.leader){
         start_buttom = document.getElementById("ready-button")
@@ -143,3 +145,27 @@ socket.on('gameMatchComplete', function(data) {
     // 로컬에 게임방 번호 저장
     localStorage.setItem("gameMatchNum", gameMatchNum)
 });
+
+socket.on('newPlayerMatched', function(data) {
+    console.log(data)
+
+
+    // 상대 플레이어 화면에 표시
+    opp_player = document.getElementsByClassName("profile-box opponent-profile")
+    opp_player.item(data.idx-2).innerHTML = `
+        <div class="profile-picture">
+            <!-- Profile picture will go here -->
+        </div>
+        <div class="profile-info">
+            <h2>${data.opp_nickname}</h2>
+            <h3>전적</h3>
+            <p>${data.opp_record.win}승 ${data.opp_record.lose}패</p>
+        </div>
+    `;
+    opp_player_idx++
+
+    if(data.leader){
+        start_buttom = document.getElementById("ready-button")
+        start_buttom.disabled  = false
+    }
+})

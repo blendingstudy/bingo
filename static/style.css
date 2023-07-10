@@ -154,7 +154,7 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #f7f7f7;
-    width: 500px;
+    width: 1000px;
 }
 
 #waiting-page {
@@ -179,12 +179,19 @@ body {
 
 .profiles-section {
     display: flex;
-    justify-content: space-around;
-    align-items: center;
+    justify-content: center;
     width: 450px;
-    height: 250px;
+    /* height: 250px; */
     margin-bottom: 20px;
+    align-items: center;
+    flex-direction: column;
+}
+
+.opponent-profiles {
+    display: flex;
+    flex-direction: row;
     align-items: stretch;
+    width: max-content;
 }
 
 .profile-box {
@@ -198,6 +205,8 @@ body {
     box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
     flex-grow: 1;
     transition: box-shadow 0.3s ease;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .profile-box:hover {
@@ -213,12 +222,14 @@ body {
     height: 100%;
     color: #666666;
     transition: color 0.3s ease;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .ready-button-section {
     width: 90%;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     margin-top: 20px;
 }
 
