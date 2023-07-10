@@ -53,21 +53,24 @@ function enterGameRoom(){
 socket.on("bingoGameInfo", function(data) {
     // console.log(data)
     const myPlayer = data.player
-    const oppPlayer = data.opp_player
+    const oppPlayers = data.opp_players
     const bingoCard = data.bingo_card
 
     console.log(myPlayer)
-    console.log(oppPlayer)
+    console.log(oppPlayers)
     console.log(bingoCard)
 
     const myRecord = `${myPlayer.record.win}승 ${myPlayer.record.lose}패`
     initializeOwnProfile(myPlayer.nickname, myRecord)
 
-    const oppRecord = `${oppPlayer.record.win}승 ${oppPlayer.record.lose}패`
-    initializeOpponentProfile(oppPlayer.nickname, oppRecord)
+    for(let i=0; i<oppPlayers.length; i++){
+        let oppPlayer = oppPlayers[i]
+        const oppRecord = `${oppPlayer.record.win}승 ${oppPlayer.record.lose}패`
+        initializeOpponentProfile(oppPlayer.nickname, oppRecord, i)
+    }
 
     displayBoard('.user .bingo-board', bingoCard);
-    displayBoard('.opponent .bingo-board', null);
+    displayOppBoard('.opponent .bingo-board', oppPlayers.length);
 
     myBingoCardCells = document.querySelectorAll(".user .bingo-board .cell")
     oppBingoCardCells = document.querySelectorAll(".opponent .bingo-board .cell")
@@ -82,7 +85,7 @@ socket.on("generateRandomNumber", function(data) {
         const ball = data.num
         let ballColor = getRandomColor()
         displayBall('.ball-container', ball, ballColor);
-        displayBall('.recent-balls', ball, ballColor);
+        // displayBall('.recent-balls', ball, ballColor);
     
         if(data.isChecked){
             checkBingo(data.x, data.y, myBingoCardCells)
@@ -144,35 +147,55 @@ function checkBingo(x, y, bingoCardCells){
 
 
 function initializeOwnProfile(nickname, record) {
-    const ownProfileBox = document.querySelector('.user .profile-section1');
-    ownProfileBox.innerHTML = generateProfileHTML(nickname, record);
+    const ownProfileBox = document.querySelector('.user .profile-section');
+    ownProfileBox.innerHTML = `
+    <div class="profile-section-picture">
+        <!-- Profile picture will go here -->
+    </div>
+    <div class="profile-info">
+        <h2 class="nickname">${nickname}</h2>
+        <h3>전적</h3>
+        <p class="record">${record}</p>
+    </div>
+`;
 }
 
-function initializeOpponentProfile(nickname, record) {
-    const opponentProfileBox = document.querySelector('.opponent .profile-section1');
-    opponentProfileBox.innerHTML = generateProfileHTML(nickname, record);
-}
-
-function generateProfileHTML(nickname, record) {
-    return `
-        <div class="profile-section1-picture">
-            <!-- Profile picture will go here -->
-        </div>
-        <div class="profile-info">
-            <h2 class="nickname">${nickname}</h2>
-            <h3>전적</h3>
-            <p class="record">${record}</p>
-        </div>
-    `;
+function initializeOpponentProfile(nickname, record, i) {
+    const opponentProfileBox = document.querySelectorAll('.opponent .profile-section');
+    opponentProfileBox.item(i).innerHTML = `
+    <div class="profile-section-picture">
+        <!-- Profile picture will go here -->
+    </div>
+    <div class="profile-info">
+        <h2 class="nickname">${nickname}</h2>
+    </div>
+`;
 }
 
 function displayBoard(selector, board) {
     let container = document.querySelector(selector);
+
     container.textContent = ''; // clear existing contents
 
-    if(board == null) {
-        for(let i=0; i<5; i++){
+    for (let row of board) {
+        for (let num of row) {
+            let cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.textContent = num;
+            container.appendChild(cell);
+        }
+    }
+}
 
+function displayOppBoard(selector, size) {
+    let containers = document.querySelectorAll(selector);
+
+    for(let i=0; i<size; i++){
+        let container = containers.item(i)
+        container.textContent = ''; // clear existing contents
+
+        for(let i=0; i<5; i++){
+    
             for(let j=0; j<5; j++){
                 let cell = document.createElement('div');
                 cell.classList.add('cell');
@@ -180,16 +203,7 @@ function displayBoard(selector, board) {
             }
         }
     }
-    else{
-        for (let row of board) {
-            for (let num of row) {
-                let cell = document.createElement('div');
-                cell.classList.add('cell');
-                cell.textContent = num;
-                container.appendChild(cell);
-            }
-        }
-    }
+    
 }
 
 function displayBall(selector, ball, color) {
@@ -206,6 +220,9 @@ function displayBall(selector, ball, color) {
     ballElement.style.textAlign = "center";
     ballElement.style.lineHeight = "40px";
     ballElement.style.backgroundColor = color;
+
+    // container.innerHTML = "";
+    // container.appendChild(ballElement);
 
     if (selector === '.recent-balls') {
         if (container.childElementCount === MAX_BALLS_DISPLAYED) {

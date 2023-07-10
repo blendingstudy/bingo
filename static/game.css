@@ -8,249 +8,6 @@ body {
     margin: 0px;
 }
 
-.center-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.input-section,
-.button-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 3px;
-}
-
-.inputContainer {
-    position: relative;
-}
-
-#nickname-input {
-    border: none;
-    border-radius: 10px;
-    padding-top: 25px;
-    padding-left: 11px;
-    padding-right: 11px;
-    font-size: 23px;
-    outline: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    height: 50px;
-    width: 170px;
-    background-color: #f3f3f3;
-    transition: background-color 0.3s ease;
-}
-
-.inputContainer label {
-    position: absolute;
-    top: 5.5px;
-    left: 7px;
-    font-size: 12px;
-    color: #999;
-}
-
-#nickname-input:hover {
-    background-color: #ebebeb;
-}
-
-#login-button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #5472b8;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#login-button:hover {
-    background-color: #3f5d99;
-}
-
-#my-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-    background-color: #f7f7f7;
-    width: 500px;
-}
-
-.profile-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 20px;
-    background-color: #ffffff;
-    width: 200px;
-    transition: background-color 0.3s ease;
-}
-
-.profile-section:hover {
-    background-color: #f3f3f3;
-}
-
-.profile-picture {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: #d1d9e0;
-    margin-bottom: 20px;
-    transition: transform 0.3s ease;
-}
-
-.profile-picture:hover {
-    transform: scale(1.1);
-}
-
-.profile-info h2,
-.profile-info h3,
-.profile-info p {
-    margin: 0;
-    text-align: center;
-}
-
-.profile-info h2 {
-    font-size: 24px;
-    margin-bottom: 10px;
-    color: #333333;
-}
-
-.profile-info h3 {
-    font-size: 20px;
-    margin-bottom: 5px;
-    color: #666666;
-}
-
-.profile-info p {
-    font-size: 16px;
-    color: #777;
-}
-
-#start-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #5472b8;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#start-button:hover {
-    background-color: #3f5d99;
-}
-
-#waiting {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f7f7f7;
-    width: 1000px;
-}
-
-#waiting-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.countdown-section {
-    width: 90%;
-    height: 10px;
-    background-color: #ebebeb;
-    margin-bottom: 60px;
-}
-
-#countdown-bar {
-    height: 100%;
-    background-color: #5472b8;
-    width: 100%; /* This will be decreased in waiting.js */
-    transition: width 0.3s ease;
-}
-
-.profiles-section {
-    display: flex;
-    justify-content: center;
-    width: 450px;
-    /* height: 250px; */
-    margin-bottom: 20px;
-    align-items: center;
-    flex-direction: column;
-}
-
-.opponent-profiles {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    width: max-content;
-}
-
-.profile-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 30%;
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-    flex-grow: 1;
-    transition: box-shadow 0.3s ease;
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-.profile-box:hover {
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
-}
-
-.vs-text {
-    font-size: 30px;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    color: #666666;
-    transition: color 0.3s ease;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.ready-button-section {
-    width: 90%;
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-#ready-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    background-color: #5472b8;
-    color: #ffffff;
-    font-size: 20px;
-    cursor: pointer;
-    outline: none;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-#ready-button:hover {
-    background-color: #3f5d99;
-    transform: scale(1.05);
-}
-
 #game {
     display: flex;
     justify-content: center;
@@ -393,8 +150,8 @@ body {
     border-radius: 10px;
     padding: 20px;
     background-color: #ffffff;
-    /* width: 100px;
-    height: 150px; */
+    width: 130px;
+    height: max-content;
     transition: background-color 0.3s ease;
 }
 
@@ -548,16 +305,27 @@ body {
     /* 기타 원하는 스타일 지정 */
 }
 
-#exit-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #5472b8;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+
+.profile-info h2,
+.profile-info h3,
+.profile-info p {
+    margin: 0;
+    text-align: center;
 }
 
-#exit-button:hover {
-    background-color: #3f5d99;
+.profile-info h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333333;
+}
+
+.profile-info h3 {
+    font-size: 20px;
+    margin-bottom: 5px;
+    color: #666666;
+}
+
+.profile-info p {
+    font-size: 16px;
+    color: #777;
 }

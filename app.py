@@ -198,12 +198,7 @@ def ready(data):
 
     # 게임대기를 요청한 유저를 대기리스트(큐)에 추가.
     player = client_sessions[nickname]
-    # if not player.get_is_waiting():
-    #     player.set_is_waiting(True)
     waiting_queue.put(player)
-
-    # 큐에 2명 이상이 들어가면 게임 매칭.
-    # if waiting_queue.qsize() >= BingoData.MIN_PLAYER_SIZE:
     matching_player()
 
 
@@ -216,7 +211,7 @@ def matching_player():
         if prev_game_match.num_of_wating_player() < BingoData.MAX_PLAYER_SIZE and not prev_game_match.is_match_complete():
             print("prev_matcing add player!!!!!")
             prev_game_match.add_player(player)
-            temp(player, prev_game_match)
+            send_match_player_info(player, prev_game_match)
             return
 
     print("new matching !!!!!")
@@ -227,7 +222,7 @@ def matching_player():
     GAME_MATCH_CNT += 1
 
 
-def temp(player, game_match):
+def send_match_player_info(player, game_match):
     # 새로운 플레이어의 정보 전달
     for opp in game_match.get_players().values():
         if opp != player:
@@ -316,7 +311,7 @@ def enter_game_room(data):
         # 플레이어 정보, 상대방 정보, 내 빙고판 정보 넘겨주기.
         response_data = {
             "player": bingo_game.get_my_info(player),
-            "opp_player": bingo_game.get_opp_info(player),
+            "opp_players": bingo_game.get_opp_info(player),
             "bingo_card": bingo_game.get_my_bingo_card(player)
         }
         emit("bingoGameInfo", response_data, room=request.sid)

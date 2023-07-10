@@ -168,4 +168,9 @@ socket.on('newPlayerMatched', function(data) {
         start_buttom = document.getElementById("ready-button")
         start_buttom.disabled  = false
     }
+
+    gameMatchNum = Number(data.game_match_num)
+
+    // 로컬에 게임방 번호 저장
+    localStorage.setItem("gameMatchNum", gameMatchNum)
 })

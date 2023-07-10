@@ -76,7 +76,7 @@ class BingoGame:
             if isChecked:
                 for opp in self.players.values():
                     if opp != player :
-                        response_data = {"x": x, "y": y}
+                        response_data = {"playerId":  player.get_id(), "x": x, "y": y}
                         emit("oppCheckBingoCell", response_data, room=opp.get_sid())
 
         # 99개 다 발표하면 종료 || 게임이 종료되면
@@ -147,15 +147,18 @@ class BingoGame:
         
     # 상대 플레이어 정보
     def get_opp_info(self, player):
+        responses = []
         for opp in self.players.values():
             if(opp != player):
 
                 response_data = {
+                    "id" : opp.get_id(),
                     "nickname" : opp.get_nickname(),
                     "record" : opp.get_record()
                 }
+                responses.append(response_data)
 
-                return response_data
+        return responses
 
     # 내 빙고판  
     def get_my_bingo_card(self, player):
