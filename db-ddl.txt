@@ -1,0 +1,24 @@
+create database bingo;
+
+use bingo;
+
+CREATE TABLE user (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    nickname VARCHAR(50) NOT NULL,
+    win INT DEFAULT 0,
+    lose INT DEFAULT 0
+);
+
+CREATE TABLE bingo_game_room (
+    bingo_game_room_id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(50)
+);
+
+CREATE TABLE game_member (
+    game_member_id INT PRIMARY KEY AUTO_INCREMENT,
+    bingo_game_room_id INT,
+    player_id INT,
+    is_win BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (bingo_game_room_id) REFERENCES bingo_game_room(bingo_game_room_id),
+    FOREIGN KEY (player_id) REFERENCES user(user_id)
+);
