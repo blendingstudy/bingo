@@ -76,13 +76,17 @@ socket.on("bingoGameInfo", function(data) {
 
 // 랜덤 숫자 발표
 // 내 빙고판에 빙고 체크
+let temp = true
 socket.on("generateRandomNumber", function(data) {
     if(!gameOver){
         console.log(data)
         const ball = data.num
         let ballColor = getRandomColor()
         displayBall('.ball-container', ball, ballColor);
-        // displayBall('.recent-balls', ball, ballColor);
+        if(temp){
+            displayBall('.recent-balls', ball, ballColor);
+            // temp=false
+        }
     
         if(data.isChecked){
             checkBingo(data.x, data.y, myBingoCardCells)
@@ -216,27 +220,28 @@ function displayBall(selector, ball, color) {
     // Give the ball a shape with a background color
     ballElement.style.width = "40px";
     ballElement.style.height = "40px";
+    ballElement.style.lineHeight = "40px";
     ballElement.style.borderRadius = "50%";
     ballElement.style.display = "inline-block";
     ballElement.style.textAlign = "center";
-    ballElement.style.lineHeight = "40px";
+    ballElement.style.marginBottom = "3px";
     ballElement.style.backgroundColor = color;
 
-    // container.innerHTML = "";
-    // container.appendChild(ballElement);
-
     if (selector === '.recent-balls') {
-        if (container.childElementCount === MAX_BALLS_DISPLAYED) {
+        if (container.childElementCount >= MAX_BALLS_DISPLAYED) {
+            console.log("max!!")
             setTimeout(() => {  // Add a delay before removing the oldest ball
                 container.removeChild(container.lastElementChild);
-            }, 505);  // Delay time in milliseconds (505ms = 0.505s)
+            }, 2005);  // Delay time in milliseconds (505ms = 0.505s)
         }
-        ballElement.style.animation = "rollIn 0.5s ease-out";  // Make the animation faster
+        ballElement.style.animation = "slideDown 0.5s ease-out";  // Make the animation faster
+
         container.insertBefore(ballElement, container.firstChild);
     } else {
         // If the container is for the ball-container, just replace the existing ball
         container.innerHTML = "";
         container.appendChild(ballElement);
+        ballElement.style.animation = "scaleUp 2s ease-out";
     }
 }
 
