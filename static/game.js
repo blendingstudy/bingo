@@ -5,7 +5,6 @@ const BOARD_SIZE = BINGO_SIZE * BINGO_SIZE;
 const MIN_BINGO_LINES = 2;
 
 let myBingoCardCells;
-let oppBingoCardCells;
 let gameOver = false;
 
 const bingoButton = document.getElementById("my-bingo-button")
@@ -62,18 +61,16 @@ socket.on("bingoGameInfo", function(data) {
 
     const myRecord = `${myPlayer.record.win}승 ${myPlayer.record.lose}패`
     initializeOwnProfile(myPlayer.nickname, myRecord)
+    displayBoard('.user .bingo-board', bingoCard);
 
     for(let i=0; i<oppPlayers.length; i++){
         let oppPlayer = oppPlayers[i]
         const oppRecord = `${oppPlayer.record.win}승 ${oppPlayer.record.lose}패`
         initializeOpponentProfile(oppPlayer.nickname, oppRecord, i)
+        displayOppBoard('.opponent .bingo-board', i, oppPlayer.id);
     }
 
-    displayBoard('.user .bingo-board', bingoCard);
-    displayOppBoard('.opponent .bingo-board', oppPlayers.length);
-
     myBingoCardCells = document.querySelectorAll(".user .bingo-board .cell")
-    oppBingoCardCells = document.querySelectorAll(".opponent .bingo-board .cell")
     // console.log(myBingoCardCells)
 })
 
@@ -96,6 +93,11 @@ socket.on("generateRandomNumber", function(data) {
 // 상대방 빙고판에 빙고 체크
 socket.on("oppCheckBingoCell", function(data) {
     // console.log(data)
+    let selector = "#bingo-board-"+data.playerId + " .cell"
+    console.log(selector)
+    let oppBingoCardCells = document.querySelectorAll(selector)
+    console.log(oppBingoCardCells)
+
     checkBingo(data.x, data.y, oppBingoCardCells)
 })
 
@@ -140,7 +142,7 @@ function checkBingo(x, y, bingoCardCells){
     const location = Number(x * 5) + Number(y)
     // console.log("체크! " + location)
     
-    // console.log(bingoCardCells[location])
+    console.log(bingoCardCells[location])
     const cell = bingoCardCells[location]
     cell.classList.add('called');
 }
@@ -187,23 +189,22 @@ function displayBoard(selector, board) {
     }
 }
 
-function displayOppBoard(selector, size) {
+function displayOppBoard(selector, num, playerId) {
     let containers = document.querySelectorAll(selector);
-
-    for(let i=0; i<size; i++){
-        let container = containers.item(i)
-        container.textContent = ''; // clear existing contents
-
-        for(let i=0; i<5; i++){
     
-            for(let j=0; j<5; j++){
-                let cell = document.createElement('div');
-                cell.classList.add('cell');
-                container.appendChild(cell);
-            }
+    let container = containers.item(num)
+    container.id = 'bingo-board-' + playerId;
+
+    container.textContent = ''; // clear existing contents
+
+    for(let i=0; i<5; i++){
+
+        for(let j=0; j<5; j++){
+            let cell = document.createElement('div');
+            cell.classList.add('cell');
+            container.appendChild(cell);
         }
     }
-    
 }
 
 function displayBall(selector, ball, color) {
