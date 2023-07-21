@@ -63,12 +63,8 @@ def loginApi():
 
     # json 데이터에서 'nickname'값 가져옴
     nickname = data.get("nickname")
-    user_id = None  # 초기화
 
-    # 이미 로그인된 유저인지 확인
-    if nickname in client_sessions.keys():
-        print(f"already signin user(이미 가입된 유저): {nickname}")
-    else:
+    if nickname not in client_sessions.keys():
         # 데이터베이스에서 해당 nickname을 가진 유저 조회
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM user WHERE nickname = %s", (nickname,))
@@ -77,8 +73,7 @@ def loginApi():
         print(user_data)
         if user_data:
             # 조회된 유저 정보를 사용하여 User 객체 생성 및 등록
-            user_id = user_data["user_id"]  # 첫 번째 열(user_id)의 인덱스 0 사용
-            user = User(user_id, nickname, user_data["win"], user_data["lose"])
+            user = User(user_data["user_id"], nickname, user_data["win"], user_data["lose"])
             client_sessions[nickname] = user
             print(f"existing user login success(기존 유저 로그인 성공): {nickname}")
         else:
@@ -86,23 +81,17 @@ def loginApi():
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO user (nickname, win, lose) VALUES (%s, %s, %s)", (nickname, 0, 0,))
                 connection.commit()
+
                 user_id = cursor.lastrowid
                 user = User(user_id, nickname, 0, 0)
                 client_sessions[nickname] = user
                 print(f"new user login success(새로운 유저 로그인 성공): {nickname}")
 
-
         cursor.close()
 
-    print('current signin user(현재 접속된 유저):')
-    for nickname in client_sessions.keys():
-        print(f"nickname(유저 ID): {nickname}")
-    print('Total number of users:', len(client_sessions))
-
     # 응답
-    response = {'user_id': user_id}  # user_id를 JSON 응답에 포함
+    response = {'user_id': client_sessions[nickname].get_id()}  # user_id를 JSON 응답에 포함
     return jsonify(response)
-
 
 
 # [GET] /user?nickname=
@@ -117,8 +106,8 @@ def userInfo():
 
     if user:
         # 조회된 유저 정보 반환
+        print("find user info(유저정보 발견):", nickname)
         response = {'nickname': user.get_nickname(), 'record': user.get_record()}
-        print("find user info(유저정보 발견):", response)
         return jsonify(response)
     else:
         print("fail to find user info(유저정보 발견 실패)")
@@ -155,18 +144,15 @@ def find_user(nickname):
 
     # 데이터베이스에서 해당 nickname을 가진 유저 조회
     with connection.cursor() as cursor:
-            sql_query = "SELECT * FROM user WHERE nickname = %s"
-            cursor.execute(sql_query, (nickname,))
-            user_data = cursor.fetchone()
+        sql_query = "SELECT * FROM user WHERE nickname = %s"
+        cursor.execute(sql_query, (nickname,))
+        user_data = cursor.fetchone()
 
-            if user_data:
-                # 조회된 유저 정보를 사용하여 User 객체 생성
-                user_id = user_data['user_id']
-                win = user_data['win']
-                lose = user_data['lose']
-                user = User(user_id, nickname, win, lose)
-                client_sessions[nickname] = user  # client_sessions에 추가
-                return user
+        if user_data:
+            # 조회된 유저 정보를 사용하여 User 객체 생성
+            user = User(user_data['user_id'], nickname, user_data['win'], user_data['lose'])
+            client_sessions[nickname] = user  # client_sessions에 추가
+            return user
 
     # 유저를 찾지 못한 경우 None 반환
     return None
@@ -176,18 +162,28 @@ def find_user(nickname):
 
 @socketio.on('connect', namespace='/')
 def on_connect():
-    print('Client connected')
+    print('Client connected:', request.sid)
 
 @socketio.on('disconnect', namespace='/')
 def on_disconnect():
-    print('Client disconnected')
+    print('Client disconnected', request.sid)
 
-@socketio.on("out", namespace='/')
-def out():
-    print("게임 강제 종료")
+# [SOCKET] resetSID
+# 유저의 sid 다시 설정
+@socketio.on("resetSID", namespace='/')
+def reset_sid(data):
+    nickname = data["nickname"]
+    user = find_user(nickname)  # 유저를 find_user() 메소드로 찾음
+
+    if user:
+        user.set_sid(request.sid)
+        print(f"Reset SID for user: {nickname}, SID: {request.sid}")
+    else:
+        print(f"User not found: {nickname}")
+
 
 # [SOCKET] waiting
-# 게임대기
+# 게임 매칭 대기
 @socketio.on('waiting', namespace='/')
 def ready(data):
 
@@ -198,30 +194,24 @@ def ready(data):
         print("fail to find user(유저정보 발견 실패)")
         return
 
-    # 게임대기를 요청한 유저를 대기리스트(큐)에 추가.
     player = client_sessions[nickname]
-    waiting_queue.put(player)
-    matching_player()
 
-
-def matching_player():
     global GAME_MATCH_CNT
-    player = waiting_queue.get()
 
+    # 이전 매칭에 플레이어 추가
     if GAME_MATCH_CNT-1 in game_matchs.keys():
         prev_game_match = game_matchs[GAME_MATCH_CNT-1]
         if prev_game_match.num_of_wating_player() < BingoData.MAX_PLAYER_SIZE and not prev_game_match.is_match_complete():
-            print("prev_matcing add player!!!!!")
+            print("add player at prev_matcing")
             prev_game_match.add_player(player)
             send_match_player_info(player, prev_game_match)
-            return
-
-    print("new matching !!!!!")
-    game_match = GameMatch(GAME_MATCH_CNT)
-    game_match.add_player(player)
-    game_matchs[GAME_MATCH_CNT] = game_match
-
-    GAME_MATCH_CNT += 1
+    # 새로운 대기방 만들기
+    else:
+        print("new matching")
+        game_match = GameMatch(GAME_MATCH_CNT)
+        game_match.add_player(player)
+        game_matchs[GAME_MATCH_CNT] = game_match
+        GAME_MATCH_CNT += 1
 
 
 def send_match_player_info(player, game_match):
@@ -247,10 +237,12 @@ def start_game(data):
     game_match_num = data["game_match_num"]
     game_match = game_matchs[game_match_num]
 
-    game_match.game_start()
-
     # 여기서 게임 만들기.
     bingo_game = create_game_room(game_match)
+
+    # 게임 매칭 완료시키고, 대기열에서 삭제
+    game_match.game_start()
+    del game_matchs[game_match_num]
 
     response_data = {"gameRoomNum" : bingo_game.get_game_room_num()}
     
@@ -276,23 +268,9 @@ def create_game_room(game_match):
     # 게임방 만들기
     bingo_game = BingoGame(game_room_id)
     bingo_game.set_players(game_match.get_players())
-    bingo_game.generate_players_bingo_card()
     bingo_games[game_room_id] = bingo_game
 
     return bingo_game
-
-# [SOCKET] resetSID
-# 유저의 sid 다시 설정
-@socketio.on("resetSID", namespace='/')
-def reset_sid(data):
-    nickname = data["nickname"]
-    user = find_user(nickname)  # 유저를 find_user() 메소드로 찾음
-
-    if user:
-        user.set_sid(request.sid)
-        print(f"Reset SID for user: {nickname}, SID: {request.sid}")
-    else:
-        print(f"User not found: {nickname}")
 
 
 # [SOCKET] enterGameRoom
@@ -316,8 +294,6 @@ def enter_game_room(data):
         }
         emit("bingoGameInfo", response_data, room=request.sid)
 
-        print(bingo_game.get_my_bingo_card(nickname))
-
         # 다 게임방에 들어왔으면 게임 시작하기.
         if bingo_game.is_every_player_ready():
             bingo_game.start_game()
@@ -330,8 +306,6 @@ def enter_game_room(data):
 # 아니면 계속 게임하기.
 @socketio.on("bingo", namespace='/')
 def bingo(data):
-    print("player click bingo button!!")
-
     game_room_num = data["gameRoomNum"]
     bingo_game = bingo_games[game_room_num]
 

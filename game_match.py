@@ -27,9 +27,9 @@ class GameMatch:
         # 먼저 들어온 사람이 방장이 되어, 게임시작 권한을 갖게됨.
         if not self.leader:
             self.leader = player
-            print(f"{player}is leader at {self.id}")
+            print(f"{player}is leader at matching {self.id}")
         self.players[player.get_nickname()] = player
-        print(f"{player}is add to match at {self.id}")
+        print(f"{player}is add to match at matching {self.id}")
 
     def remove_player(self, player):
         if player in self.players:

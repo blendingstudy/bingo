@@ -99,7 +99,7 @@ body {
 }
 
 .cell.called {
-    background-color: #5472b8;
+    background-color: #ffca37;
 }
 
 .bingo-button {
@@ -215,7 +215,7 @@ body {
     justify-content: flex-end;
     align-items: center;
     width: 80px;
-    height: 300px;
+    height: 320px;
     border-radius: 20px;
     background-color: #f3f3f3;
     overflow: auto;
@@ -227,6 +227,16 @@ body {
     /* padding-top: 50px; */
     padding-bottom: 10px;
     overflow: hidden;
+}
+
+.ball {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 50%;
+    display: inline-block;
+    text-align: center;
+    margin-bottom: 3px;
 }
 
 @keyframes slideDown {

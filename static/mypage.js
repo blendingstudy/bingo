@@ -1,12 +1,8 @@
 
-// const socket = io("localhost:5000")
-
 console.log("마이페이지 입장")
 
 let userNickname = localStorage.getItem('nickname');  // Retrieve nickname from local storage
 
-// socket.emit('fetchNickname', {nickname: userNickname});
-// socket.emit('fetchRecord', {nickname: userNickname});
 
 getUserInfo()
 
@@ -36,18 +32,6 @@ function getUserInfo(){
 
 }
 
-// // Listen for 'fetchNicknameResponse' event from server and handle it
-// socket.on('fetchNicknameResponse', function(data) {
-//     // Display user's nickname
-//     document.getElementById('user-nickname').textContent = data.nickname;
-// });
-
-// // Listen for 'fetchRecordResponse' event from server and handle it
-// socket.on('fetchRecordResponse', function(data) {
-//     // Display user's game record
-//     let record = data.record.win + '승 ' + data.record.lose + '패';
-//     document.getElementById('record').textContent = record;
-// });
 
 // Redirect to waiting.html when start button is clicked
 document.getElementById('start-button').addEventListener('click', function() {

@@ -1,6 +1,3 @@
-// const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-// const socket = io("localhost:5000")
-
 let userNickname;  // Declare userNickname variable here
 
 document.getElementById('login-button').addEventListener('click', function() {
@@ -37,13 +34,3 @@ document.getElementById('login-button').addEventListener('click', function() {
         });
       
 });
-
-// Listen for 'loginResponse' event from server and handle it
-// socket.on('loginResponse', function(data) {
-//     if (data.success) {
-//         localStorage.setItem('nickname', userNickname);  // Now userNickname is accessible here
-//         window.location.href = '/mypage';
-//     } else {
-//         alert('Nickname already in use. Please choose another one.');
-//     }
-// });
