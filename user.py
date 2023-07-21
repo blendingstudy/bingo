@@ -1,5 +1,6 @@
 from bingo_card import BingoCard
-import mysql.connector
+from bingo_data import BingoData
+import pymysql.cursors
 
 
 class User:
@@ -11,6 +12,12 @@ class User:
         self.sid = None
         self.record = {'win': win, 'lose': lose}
         self.is_waiting = False
+        self.connection = pymysql.connect(host=BingoData.MYSQL_HOST,
+                             user=BingoData.MYSQL_USER,
+                             password=BingoData.MYSQL_PW,
+                             db=BingoData.MYSQL_DB,
+                             charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
 
     def get_nickname(self):
         return self.nickname
@@ -41,50 +48,24 @@ class User:
         self.update_win_in_db()
 
     def update_win_in_db(self):
-        try:
-            conn = mysql.connector.connect(
-                host='localhost',
-                user='root',
-                password='enfj3913',
-                database='bingo'
-            )
-            cursor = conn.cursor()
-
+         with self.connection.cursor() as cursor:
             # Increase the win count in the database for the user_id
-            query = "UPDATE user SET win = win + 1 WHERE user_id = %s"
+            sql_query = "UPDATE user SET win = win + 1 WHERE user_id = %s"
             values = (self.id,)
-            cursor.execute(query, values)
-            conn.commit()
-
-            cursor.close()
-            conn.close()
-        except mysql.connector.Error as error:
-            print("Error while updating win count in the database:", error)
+            cursor.execute(sql_query, values)
+            self.connection.commit()
 
     def lose(self):
         self.record['lose'] += 1
         self.update_lose_in_db()
 
     def update_lose_in_db(self):
-        try:
-            conn = mysql.connector.connect(
-                host='localhost',
-                user='root',
-                password='enfj3913',
-                database='bingo'
-            )
-            cursor = conn.cursor()
-
+        with self.connection.cursor() as cursor:
             # Increase the lose count in the database for the user_id
-            query = "UPDATE user SET lose = lose + 1 WHERE user_id = %s"
+            sql_query = "UPDATE user SET lose = lose + 1 WHERE user_id = %s"
             values = (self.id,)
-            cursor.execute(query, values)
-            conn.commit()
-
-            cursor.close()
-            conn.close()
-        except mysql.connector.Error as error:
-            print("Error while updating lose count in the database:", error)
+            cursor.execute(sql_query, values)
+            self.connection.commit()
 
     def generate_bingo_card(self):
         self.bingo_card = BingoCard()

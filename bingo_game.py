@@ -2,15 +2,14 @@ from flask import Flask, render_template, request, session, jsonify
 from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect
 from flask_session import Session  # for server-side sessions
 import random
-from user import User
-from bingo_card import BingoCard
 from bingo_data import BingoData
-import threading
 import sched
 import time
-import mysql.connector
+import pymysql.cursors
 
 class BingoGame:
+
+    
 
     def __init__(self, game_room_num):
         self.players = {}
@@ -19,6 +18,12 @@ class BingoGame:
         self.scheduler = sched.scheduler(time.time, time.sleep)
         self.random_numbers = []
         self.is_game_over = False
+        self.connection = pymysql.connect(host=BingoData.MYSQL_HOST,
+                             user=BingoData.MYSQL_USER,
+                             password=BingoData.MYSQL_PW,
+                             db=BingoData.MYSQL_DB,
+                             charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
 
         self.generate_players_bingo_card()
 
@@ -105,25 +110,13 @@ class BingoGame:
             if player == winner:
                 winner.win()
                 emit("bingoGameOver", {"isWin": True}, room=player.get_sid())
-                try:
-                    conn = mysql.connector.connect(
-                        host='localhost',
-                        user='root',
-                        password='enfj3913',
-                        database='bingo'
-                    )
-                    cursor = conn.cursor()
 
+                with self.connection.cursor() as cursor:
                     # Increase the win count in the database for the user_id
-                    query = "UPDATE game_member SET is_win = 1 WHERE player_id = %s and bingo_game_room_id = %s"
+                    sql_query = "UPDATE game_member SET is_win = 1 WHERE player_id = %s and bingo_game_room_id = %s"
                     values = (winner.get_id(), self.game_room_num, )
-                    cursor.execute(query, values)
-                    conn.commit()
-
-                    cursor.close()
-                    conn.close()
-                except mysql.connector.Error as error:
-                    print("Error while updating win count in the database:", error)
+                    cursor.execute(sql_query, values)
+                    self.connection.commit()
             else:
                 player.lose()
                 emit("bingoGameOver", {"isWin": False}, room=player.get_sid())

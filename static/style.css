@@ -455,8 +455,8 @@ body {
 
 .recent-balls {
     display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
+    flex-direction: column;
+    /* justify-content: flex-end; */
     align-items: center;
     width: 80px;
     height: 300px;

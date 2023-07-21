@@ -2,31 +2,30 @@ from flask import Flask, render_template, request, session, jsonify
 from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect
 from flask_session import Session  # for server-side sessions
 import os
-import threading
-import time
 from queue import Queue
 from user import User
 from bingo_game import BingoGame
 from bingo_data import BingoData
-from flask_mysqldb import MySQL
-from MySQLdb.cursors import DictCursor
+import pymysql.cursors
 from game_match import GameMatch
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.urandom(24)
-# MySQL 설정
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'enfj3913'
-app.config['MYSQL_DB'] = 'bingo'
 
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
 
 socketio = SocketIO(app, manage_session=False)
-mysql = MySQL(app)
+
+# Connect to the database
+connection = pymysql.connect(host=BingoData.MYSQL_HOST,
+                             user=BingoData.MYSQL_USER,
+                             password=BingoData.MYSQL_PW,
+                             db=BingoData.MYSQL_DB,
+                             charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
 
 client_sessions = {}
 bingo_games = {}
@@ -71,26 +70,29 @@ def loginApi():
         print(f"already signin user(이미 가입된 유저): {nickname}")
     else:
         # 데이터베이스에서 해당 nickname을 가진 유저 조회
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM user WHERE nickname = %s", (nickname,))
-        user_data = cur.fetchone()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM user WHERE nickname = %s", (nickname,))
+            user_data = cursor.fetchone()
 
+        print(user_data)
         if user_data:
             # 조회된 유저 정보를 사용하여 User 객체 생성 및 등록
-            user_id = user_data[0]  # 첫 번째 열(user_id)의 인덱스 0 사용
-            user = User(user_id, nickname, user_data[2], user_data[3])
+            user_id = user_data["user_id"]  # 첫 번째 열(user_id)의 인덱스 0 사용
+            user = User(user_id, nickname, user_data["win"], user_data["lose"])
             client_sessions[nickname] = user
             print(f"existing user login success(기존 유저 로그인 성공): {nickname}")
         else:
             # 조회된 유저가 없을 경우 새로운 유저로 등록
-            cur.execute("INSERT INTO user (nickname, win, lose) VALUES (%s, %s, %s)", (nickname, 0, 0))
-            mysql.connection.commit()
-            user_id = cur.lastrowid
-            user = User(user_id, nickname, 0, 0)
-            client_sessions[nickname] = user
-            print(f"new user login success(새로운 유저 로그인 성공): {nickname}")
+            with connection.cursor() as cursor:
+                cursor.execute("INSERT INTO user (nickname, win, lose) VALUES (%s, %s, %s)", (nickname, 0, 0,))
+                connection.commit()
+                user_id = cursor.lastrowid
+                user = User(user_id, nickname, 0, 0)
+                client_sessions[nickname] = user
+                print(f"new user login success(새로운 유저 로그인 성공): {nickname}")
 
-        cur.close()
+
+        cursor.close()
 
     print('current signin user(현재 접속된 유저):')
     for nickname in client_sessions.keys():
@@ -127,10 +129,9 @@ def userInfo():
 @app.route('/userRead')
 def user_read():
     # 데이터베이스 쿼리
-    cur = mysql.connection.cursor()
-    cur.execute('SELECT * FROM user')
-    results = cur.fetchall()
-    cur.close()
+    with connection.cursor() as cursor:
+        cursor.execute('SELECT * FROM user')
+        results = cursor.fetchall()
 
     # 결과 출력
     for row in results:
@@ -146,25 +147,26 @@ def test():
     response = {'message': 'TEST 요청 처리 완료'}
     return jsonify(response)
 
+
 def find_user(nickname):
     # client_sessions에서 해당 nickname 유저 찾기
     if nickname in client_sessions.keys():
         return client_sessions[nickname]
 
     # 데이터베이스에서 해당 nickname을 가진 유저 조회
-    cur = mysql.connection.cursor(cursorclass=DictCursor)
-    cur.execute("SELECT * FROM user WHERE nickname = %s", (nickname,))
-    user_data = cur.fetchone()
-    cur.close()
+    with connection.cursor() as cursor:
+            sql_query = "SELECT * FROM user WHERE nickname = %s"
+            cursor.execute(sql_query, (nickname,))
+            user_data = cursor.fetchone()
 
-    if user_data:
-        # 조회된 유저 정보를 사용하여 User 객체 생성
-        user_id = user_data['user_id']
-        win = user_data['win']
-        lose = user_data['lose']
-        user = User(user_id, nickname, win, lose)
-        client_sessions[nickname] = user  # client_sessions에 추가
-        return user
+            if user_data:
+                # 조회된 유저 정보를 사용하여 User 객체 생성
+                user_id = user_data['user_id']
+                win = user_data['win']
+                lose = user_data['lose']
+                user = User(user_id, nickname, win, lose)
+                client_sessions[nickname] = user  # client_sessions에 추가
+                return user
 
     # 유저를 찾지 못한 경우 None 반환
     return None
@@ -260,18 +262,16 @@ def start_game(data):
 def create_game_room(game_match):
     # MySQL 데이터베이스에 게임방 생성
     title = "빙고게임 시작"
-    cur = mysql.connection.cursor()
-    cur.execute("INSERT INTO bingo_game_room (title) VALUES (%s)", (title,))
-    mysql.connection.commit()
-    game_room_id = cur.lastrowid
-    cur.close()
+    with connection.cursor() as cursor:
+        cursor.execute("INSERT INTO bingo_game_room (title) VALUES (%s)", (title,))
+        connection.commit()
+        game_room_id = cursor.lastrowid
 
     # 게임 멤버 테이블에 게임룸 ID와 유저 ID 추가
-    cur = mysql.connection.cursor()
-    for player in game_match.get_players().values():
-        cur.execute("INSERT INTO game_member (bingo_game_room_id, player_id) VALUES (%s, %s)", (game_room_id, player.get_id()))
-        mysql.connection.commit()
-    cur.close()
+    with connection.cursor() as cursor:
+        for player in game_match.get_players().values():
+            cursor.execute("INSERT INTO game_member (bingo_game_room_id, player_id) VALUES (%s, %s)", (game_room_id, player.get_id()))
+            connection.commit()
 
     # 게임방 만들기
     bingo_game = BingoGame(game_room_id)
@@ -349,4 +349,4 @@ def bingo(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True)
