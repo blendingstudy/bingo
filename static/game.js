@@ -1,6 +1,6 @@
 const MAX_NUM = 99;
 const BINGO_SIZE = 5;
-const MAX_BALLS_DISPLAYED = 5;
+const MAX_BALLS_DISPLAYED = 6;
 const BOARD_SIZE = BINGO_SIZE * BINGO_SIZE;
 const MIN_BINGO_LINES = 2;
 
@@ -76,17 +76,13 @@ socket.on("bingoGameInfo", function(data) {
 
 // 랜덤 숫자 발표
 // 내 빙고판에 빙고 체크
-let temp = true
 socket.on("generateRandomNumber", function(data) {
     if(!gameOver){
         console.log(data)
         const ball = data.num
         let ballColor = getRandomColor()
         displayBall('.ball-container', ball, ballColor);
-        if(temp){
-            displayBall('.recent-balls', ball, ballColor);
-            // temp=false
-        }
+        displayBall('.recent-balls', ball, ballColor);
     
         if(data.isChecked){
             checkBingo(data.x, data.y, myBingoCardCells)
@@ -234,9 +230,12 @@ function displayBall(selector, ball, color) {
                 container.removeChild(container.lastElementChild);
             }, 2005);  // Delay time in milliseconds (505ms = 0.505s)
         }
-        ballElement.style.animation = "slideDown 0.5s ease-out";  // Make the animation faster
+        setTimeout(() => {
+            ballElement.style.animation = "slideDown 0.5s ease-out";  // Make the animation faster
 
-        container.insertBefore(ballElement, container.firstChild);
+            container.insertBefore(ballElement, container.firstChild);
+        }, 2000)
+        
     } else {
         // If the container is for the ball-container, just replace the existing ball
         container.innerHTML = "";
