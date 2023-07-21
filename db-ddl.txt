@@ -5,6 +5,7 @@ use bingo;
 CREATE TABLE user (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     nickname VARCHAR(50) NOT NULL,
+    password VARCHAR(50) NOT NULL,
     win INT DEFAULT 0,
     lose INT DEFAULT 0
 );

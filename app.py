@@ -63,11 +63,14 @@ def loginApi():
 
     # json 데이터에서 'nickname'값 가져옴
     nickname = data.get("nickname")
+    password = data.get("password")
+
+    print("password:", password)
 
     if nickname not in client_sessions.keys():
         # 데이터베이스에서 해당 nickname을 가진 유저 조회
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM user WHERE nickname = %s", (nickname,))
+            cursor.execute("SELECT * FROM user WHERE nickname = %s and password = %s", (nickname, password, ))
             user_data = cursor.fetchone()
 
         print(user_data)
@@ -77,15 +80,20 @@ def loginApi():
             client_sessions[nickname] = user
             print(f"existing user login success(기존 유저 로그인 성공): {nickname}")
         else:
-            # 조회된 유저가 없을 경우 새로운 유저로 등록
-            with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO user (nickname, win, lose) VALUES (%s, %s, %s)", (nickname, 0, 0,))
-                connection.commit()
+            print("no user!!!!!")
+            error_message = {'error': '유저정보 발견 실패.'}
+            return jsonify(error_message), 404
 
-                user_id = cursor.lastrowid
-                user = User(user_id, nickname, 0, 0)
-                client_sessions[nickname] = user
-                print(f"new user login success(새로운 유저 로그인 성공): {nickname}")
+        # else:
+        #     # 조회된 유저가 없을 경우 새로운 유저로 등록
+        #     with connection.cursor() as cursor:
+        #         cursor.execute("INSERT INTO user (nickname, password, win, lose) VALUES (%s, %s, %s, %s)", (nickname, password, 0, 0,))
+        #         connection.commit()
+
+        #         user_id = cursor.lastrowid
+        #         user = User(user_id, nickname, 0, 0)
+        #         client_sessions[nickname] = user
+        #         print(f"new user login success(새로운 유저 로그인 성공): {nickname}")
 
         cursor.close()
 

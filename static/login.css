@@ -15,6 +15,12 @@ body {
     align-items: center;
 }
 
+.bingo-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 100px;
+}
+
 .input-section,
 .button-section {
     display: flex;
@@ -25,9 +31,25 @@ body {
 
 .inputContainer {
     position: relative;
+    margin-bottom: 10px;
 }
 
 #nickname-input {
+    border: none;
+    border-radius: 10px;
+    padding-top: 25px;
+    padding-left: 11px;
+    padding-right: 11px;
+    font-size: 23px;
+    outline: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    height: 50px;
+    width: 170px;
+    background-color: #f3f3f3;
+    transition: background-color 0.3s ease;
+}
+
+#password-input {
     border: none;
     border-radius: 10px;
     padding-top: 25px;

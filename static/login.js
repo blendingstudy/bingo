@@ -1,8 +1,11 @@
-let userNickname;  // Declare userNickname variable here
+let inputNickname;  // Declare userNickname variable here
+let inputPW;
 
 document.getElementById('login-button').addEventListener('click', function() {
-    userNickname = document.getElementById('nickname-input').value;  // Assign value to userNickname here
+    inputNickname = document.getElementById('nickname-input').value;  // Assign value to userNickname here
     document.getElementById('nickname-input').value = "";
+    inputPW = document.getElementById('password-input').value;  // Assign value to userNickname here
+    document.getElementById('password-input').value = "";
 
     console.log("입장 버튼 누름!")
     
@@ -10,7 +13,8 @@ document.getElementById('login-button').addEventListener('click', function() {
     // socket.emit('login', {nickname: userNickname});
 
     const data = {
-        "nickname": userNickname,
+        "nickname": inputNickname,
+        "password": inputPW
     };
 
     fetch("http://localhost:5000/login", {
@@ -24,7 +28,7 @@ document.getElementById('login-button').addEventListener('click', function() {
         .then(data => {
             // 응답 데이터 처리
             console.log(data)
-            localStorage.setItem('nickname', userNickname);  // Now userNickname is accessible here
+            localStorage.setItem('nickname', inputNickname);  // Now userNickname is accessible here
             localStorage.setItem('userId', data.user_id);
             window.location.href = '/mypage';
         })
