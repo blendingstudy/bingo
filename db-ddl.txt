@@ -9,12 +9,13 @@ CREATE TABLE user (
     referral INT,
     win INT DEFAULT 0,
     lose INT DEFAULT 0,
+    prfile_img VARCHAR(500),
     FOREIGN KEY (referral) REFERENCES user(user_id)
 );
 
 CREATE TABLE bingo_game_room (
     bingo_game_room_id INT PRIMARY KEY AUTO_INCREMENT,
-    title VARCHAR(50)
+    status VARCHAR(50)
 );
 
 CREATE TABLE game_member (

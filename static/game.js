@@ -45,7 +45,7 @@ socket.on("bingoGameInfo", function(data) {
 
     // 내 정보
     const myRecord = `${myPlayer.record.win}승 ${myPlayer.record.lose}패`
-    initializeOwnProfile(myPlayer.nickname, myRecord)
+    initializeOwnProfile(myPlayer.nickname, myRecord, myPlayer.profile_img)
     displayMyBoard('.user .bingo-board', bingoCard);
     myBingoCardCells = document.querySelectorAll(".user .bingo-board .cell")
 
@@ -53,7 +53,7 @@ socket.on("bingoGameInfo", function(data) {
     for(let i=0; i<oppPlayers.length; i++){
         let oppPlayer = oppPlayers[i]
         const oppRecord = `${oppPlayer.record.win}승 ${oppPlayer.record.lose}패`
-        initializeOpponentProfile(oppPlayer.nickname, oppRecord, i)
+        initializeOpponentProfile(oppPlayer.nickname, oppRecord, oppPlayer.profile_img, i)
         displayOppBoard('.opponent .bingo-board', i, oppPlayer.id);
     }
 })
@@ -132,11 +132,11 @@ function checkBingo(x, y, bingoCardCells){
 }
 
 
-function initializeOwnProfile(nickname, record) {
+function initializeOwnProfile(nickname, record, profile_img) {
     const ownProfileBox = document.querySelector('.user .profile-section');
     ownProfileBox.innerHTML = `
     <div class="profile-section-picture">
-        <!-- Profile picture will go here -->
+        <img class="profile-image" src=${profile_img} alt="프로필 이미지">
     </div>
     <div class="profile-info">
         <h2 class="nickname">${nickname}</h2>
@@ -146,11 +146,11 @@ function initializeOwnProfile(nickname, record) {
 `;
 }
 
-function initializeOpponentProfile(nickname, record, i) {
+function initializeOpponentProfile(nickname, record, profile_img, i) {
     const opponentProfileBox = document.querySelectorAll('.opponent .profile-section');
     opponentProfileBox.item(i).innerHTML = `
     <div class="profile-section-picture">
-        <!-- Profile picture will go here -->
+        <img class="profile-image" src=${profile_img} alt="프로필 이미지">
     </div>
     <div class="profile-info">
         <h2 class="nickname">${nickname}</h2>

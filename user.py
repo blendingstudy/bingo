@@ -5,13 +5,14 @@ import pymysql.cursors
 
 class User:
 
-    def __init__(self, id, nickname, win, lose):
+    def __init__(self, id, nickname, win, lose, profile_img):
         self.id = id
         self.nickname = nickname
         self.bingo_card = None
         self.sid = None
         self.record = {'win': win, 'lose': lose}
         self.is_waiting = False
+        self.profile_img = profile_img
         self.connection = pymysql.connect(host=BingoData.MYSQL_HOST,
                              user=BingoData.MYSQL_USER,
                              password=BingoData.MYSQL_PW,
@@ -36,6 +37,9 @@ class User:
 
     def get_id(self):
         return self.id
+
+    def get_profile_img(self):
+        return self.profile_img
 
     def set_sid(self, sid):
         self.sid = sid

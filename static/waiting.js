@@ -33,6 +33,14 @@ function getUserInfo(){
         .then(data => {
             // 응답 데이터 처리
             console.log(data)
+            
+            const imgElement = document.createElement("img");
+            imgElement.classList.add("profile-image");
+            imgElement.src = data.profileIMG;
+            imgElement.alt = "프로필 이미지";
+            
+            document.querySelector(".own-profile .profile-picture").appendChild(imgElement);
+
             document.getElementById('own-nickname').textContent = data.nickname;
             let record = data.record.win + '승 ' + data.record.lose + '패';
             document.getElementById('own-record').textContent = record;
@@ -60,7 +68,7 @@ socket.on('gameMatchComplete', function(data) {
     opp_player = document.getElementsByClassName("profile-box opponent-profile")
     opp_player.item(opp_player_idx).innerHTML = `
         <div class="profile-picture">
-            <!-- Profile picture will go here -->
+            <img class="profile-image" src=${data.opp_profile_img} alt="프로필 이미지">
         </div>
         <div class="profile-info">
             <h2>${data.opp_nickname}</h2>

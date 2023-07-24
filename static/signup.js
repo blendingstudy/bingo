@@ -10,7 +10,6 @@ function validateAndSubmit() {
     var errorMessageForNickname = document.getElementById('errorMessage-nickname');
     var errorMessageForPW = document.getElementById('errorMessage-pw');
     var errorMessageForPW2 = document.getElementById('errorMessage-pw2');
-    var errorMessageForReferral = document.getElementById('errorMessage-referral');
 
     var errorMessages = document.getElementsByClassName('errorMessage');
     for(let i=0; i<errorMessages.length; i++){

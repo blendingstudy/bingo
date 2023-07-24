@@ -54,6 +54,21 @@ body {
     flex-direction: row-reverse;
 }
 
+.profile-picture {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #d1d9e0;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
 .bingo-container {
     display: flex;
     flex-direction: row;

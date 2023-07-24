@@ -34,7 +34,8 @@ class BingoGame:
         if player in self.players.values():
             response_data = {
                 "nickname" : player.get_nickname(),
-                "record" : player.get_record()
+                "record" : player.get_record(),
+                "profile_img": player.get_profile_img()
             }
 
             return response_data
@@ -48,7 +49,8 @@ class BingoGame:
                 response_data = {
                     "id" : opp.get_id(),
                     "nickname" : opp.get_nickname(),
-                    "record" : opp.get_record()
+                    "record" : opp.get_record(),
+                    "profile_img": opp.get_profile_img()
                 }
                 responses.append(response_data)
 

@@ -8,6 +8,7 @@ from bingo_game import BingoGame
 from bingo_data import BingoData
 import pymysql.cursors
 from game_match import GameMatch
+import random
 
 app = Flask(__name__)
 
@@ -37,26 +38,32 @@ waiting_queue = Queue()
 
 # 로그인 페이지
 @app.route('/')
-def indexPage():
+def index_page():
     return render_template('login.html')
 
 @app.route('/signup')
-def signupPage():
+def signup_page():
     return render_template('signup.html')
 
 # 마이페이지
 @app.route('/mypage')
-def mypagePage():
+def mypage_page():
     return render_template('mypage.html')
+
+# 게임방 리스트 페이지
+@app.route('/gameroom/list')
+def game_room_list_page():
+    return render_template('game_room_list.html')
+
 
 # 대기 페이지
 @app.route('/waiting')
-def waitingPage():
+def waiting_page():
     return render_template('waiting.html')
 
 # 게임 페이지
 @app.route('/game')
-def gamePage():
+def game_page():
     return render_template('game.html')
 
 
@@ -78,7 +85,7 @@ def loginApi():
     print(user_data)
     if user_data:
         # 조회된 유저 정보를 사용하여 User 객체 생성 및 등록
-        user = User(user_data["user_id"], nickname, user_data["win"], user_data["lose"])
+        user = User(user_data["user_id"], nickname, user_data["win"], user_data["lose"], user_data['profile_img'])
         client_sessions[nickname] = user
         print(f"login success(로그인 성공): {nickname}")
         # 응답
@@ -118,14 +125,18 @@ def signup():
             referral_user_data = cursor.fetchone()
             if referral_user_data:
                 referral_user_id = referral_user_data['user_id']
+        
+        # 프로필 이미지 설정
+        random_number = random.randint(0, len(BingoData.PROFILE_IMG_LIST))
+        random_profile_img = BingoData.PROFILE_IMG_LIST[random_number]
 
         # 회원가입
         with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO user (nickname, password, win, lose, referral) VALUES (%s, %s, %s, %s, %s)", (nickname, password, 0, 0, referral_user_id, ))
+            cursor.execute("INSERT INTO user (nickname, password, referral, profile_img) VALUES (%s, %s, %s, %s)", (nickname, password, referral_user_id, random_profile_img, ))
             connection.commit()
 
             user_id = cursor.lastrowid
-            user = User(user_id, nickname, 0, 0)
+            user = User(user_id, nickname, 0, 0, random_profile_img)
             client_sessions[nickname] = user
             print(f"new user signup success(회원가입 성공): {nickname}")
 
@@ -166,7 +177,7 @@ def userInfo():
     if user:
         # 조회된 유저 정보 반환
         print("find user info(유저정보 발견):", nickname)
-        response = {'nickname': user.get_nickname(), 'record': user.get_record()}
+        response = {'nickname': user.get_nickname(), 'record': user.get_record(), "profileIMG": user.get_profile_img()}
         return jsonify(response)
     else:
         print("fail to find user info(유저정보 발견 실패)")
@@ -209,7 +220,7 @@ def find_user(nickname):
 
         if user_data:
             # 조회된 유저 정보를 사용하여 User 객체 생성
-            user = User(user_data['user_id'], nickname, user_data['win'], user_data['lose'])
+            user = User(user_data['user_id'], nickname, user_data['win'], user_data['lose'], user_data['profile_img'])
             client_sessions[nickname] = user  # client_sessions에 추가
             return user
 
@@ -283,7 +294,7 @@ def send_match_player_info(player, game_match):
     # 새로운 플레이어에게 이전 매칭된 플레이어 정보 전달
     for opp in game_match.get_players().values():
         if opp != player:
-            response_data = {"leader": game_match.get_leader() == player, "game_match_num": game_match.get_id(), "opp_nickname": opp.get_nickname(), "opp_record": opp.get_record()}
+            response_data = {"leader": game_match.get_leader() == player, "game_match_num": game_match.get_id(), "opp_nickname": opp.get_nickname(), "opp_record": opp.get_record(), "opp_profile_img": opp.get_profile_img()}
             emit('gameMatchComplete', response_data, room=player.get_sid())
             # print(f"send to a-sid: {player_a.get_sid()}")
 
@@ -312,9 +323,9 @@ def start_game(data):
 
 def create_game_room(game_match):
     # MySQL 데이터베이스에 게임방 생성
-    title = "빙고게임 시작"
+    status = "WAITING"
     with connection.cursor() as cursor:
-        cursor.execute("INSERT INTO bingo_game_room (title) VALUES (%s)", (title,))
+        cursor.execute("INSERT INTO bingo_game_room (status) VALUES (%s)", (status,))
         connection.commit()
         game_room_id = cursor.lastrowid
 
