@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>회원가입 페이지</title>
+    <link rel="stylesheet" href="/static/signup.css">
+    <script src="/static/signup.js" defer></script>
+</head>
+<body>
+    <form id="signupForm">
+        <div>
+            <label for="nickname">닉네임</label>
+            <button type="button" id="checkNickname" onclick="checkNicknameDuplicate()">중복 확인</button>
+            <input type="text" id="nickname" name="nickname" required>
+            <div class="errorMessage">
+                <p id="errorMessage-nickname"></p>
+            </div>
+        </div>
+        <div>
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" minlength="6" required>
+            <div class="errorMessage">
+                <p id="errorMessage-pw"></p>
+            </div>
+        </div>
+        <div>
+            <label for="confirmPassword">비밀번호 확인</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" minlength="6" required>
+            <div class="errorMessage">
+                <p id="errorMessage-pw2"></p>
+            </div>
+        </div>
+        <div>
+            <label for="referral">추천인</label>
+            <input type="text" id="referral" name="referral">
+            <div class="errorMessage">
+                <p id="errorMessage-referral"></p>
+            </div>
+        </div>
+        
+        <div class="button">
+            <button type="button" id="signup-button" onclick="validateAndSubmit()">회원가입</button>
+        </div>
+    </form>
+</body>
+</html>

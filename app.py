@@ -37,23 +37,28 @@ waiting_queue = Queue()
 
 # 로그인 페이지
 @app.route('/')
-def index():
+def indexPage():
     return render_template('login.html')
+
+@app.route('/signup')
+def signupPage():
+    return render_template('signup.html')
 
 # 마이페이지
 @app.route('/mypage')
-def mypage():
+def mypagePage():
     return render_template('mypage.html')
 
 # 대기 페이지
 @app.route('/waiting')
-def waiting():
+def waitingPage():
     return render_template('waiting.html')
 
 # 게임 페이지
 @app.route('/game')
-def game():
+def gamePage():
     return render_template('game.html')
+
 
 # [GET] /login
 # 로그인
@@ -61,45 +66,91 @@ def game():
 def loginApi():
     data = request.get_json()
 
-    # json 데이터에서 'nickname'값 가져옴
+    # json 데이터에서 nickname, password값 가져옴
     nickname = data.get("nickname")
     password = data.get("password")
 
-    print("password:", password)
+    # 데이터베이스에서 해당 nickname과 pw를 가진 유저 조회
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM user WHERE nickname = %s and password = %s", (nickname, password, ))
+    
+    user_data = cursor.fetchone()
+    print(user_data)
+    if user_data:
+        # 조회된 유저 정보를 사용하여 User 객체 생성 및 등록
+        user = User(user_data["user_id"], nickname, user_data["win"], user_data["lose"])
+        client_sessions[nickname] = user
+        print(f"login success(로그인 성공): {nickname}")
+        # 응답
+        response = {'user_id': user_data["user_id"]}  # user_id를 JSON 응답에 포함
+        return jsonify(response)
+    else:
+        print("no user!!!!!")
+        return "404 user not found", 404
 
-    if nickname not in client_sessions.keys():
-        # 데이터베이스에서 해당 nickname을 가진 유저 조회
+
+# [POST] /signup
+# 회원가입
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+
+    nickname = data.get("nickname")
+    password = data.get("password")
+    referral = data.get("referral")
+
+    # 데이터베이스에서 해당 nickname을 가진 유저 조회
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM user WHERE nickname = %s", (nickname, ))
+    
+    user_data = cursor.fetchone()
+    print(user_data)
+    if user_data: # 이미 가입된 유저 닉네임
+        print("user is already exist")
+        return "404 user is already exist", 404
+    else:
+        # 추천인 조회
+        referral_user_id = None
+        if referral:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM user WHERE nickname = %s", (referral, ))
+            
+            referral_user_data = cursor.fetchone()
+            if referral_user_data:
+                referral_user_id = referral_user_data['user_id']
+
+        # 회원가입
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM user WHERE nickname = %s and password = %s", (nickname, password, ))
-            user_data = cursor.fetchone()
+            cursor.execute("INSERT INTO user (nickname, password, win, lose, referral) VALUES (%s, %s, %s, %s, %s)", (nickname, password, 0, 0, referral_user_id, ))
+            connection.commit()
 
-        print(user_data)
-        if user_data:
-            # 조회된 유저 정보를 사용하여 User 객체 생성 및 등록
-            user = User(user_data["user_id"], nickname, user_data["win"], user_data["lose"])
+            user_id = cursor.lastrowid
+            user = User(user_id, nickname, 0, 0)
             client_sessions[nickname] = user
-            print(f"existing user login success(기존 유저 로그인 성공): {nickname}")
-        else:
-            print("no user!!!!!")
-            error_message = {'error': '유저정보 발견 실패.'}
-            return jsonify(error_message), 404
+            print(f"new user signup success(회원가입 성공): {nickname}")
 
-        # else:
-        #     # 조회된 유저가 없을 경우 새로운 유저로 등록
-        #     with connection.cursor() as cursor:
-        #         cursor.execute("INSERT INTO user (nickname, password, win, lose) VALUES (%s, %s, %s, %s)", (nickname, password, 0, 0,))
-        #         connection.commit()
+        # 응답
+        response_data = {"userId" : user_id}
+        return jsonify(response_data)
 
-        #         user_id = cursor.lastrowid
-        #         user = User(user_id, nickname, 0, 0)
-        #         client_sessions[nickname] = user
-        #         print(f"new user login success(새로운 유저 로그인 성공): {nickname}")
 
-        cursor.close()
+# [GET] /user/duplicate?nickname=
+# 닉네임 중복 확인
+@app.route('/user/duplicate', methods=['GET'])
+def checkNicknameDuplicate():
+    nickname = request.args.get('nickname')
 
-    # 응답
-    response = {'user_id': client_sessions[nickname].get_id()}  # user_id를 JSON 응답에 포함
-    return jsonify(response)
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM user WHERE nickname = %s", (nickname, ))
+    
+    user_data = cursor.fetchone()
+
+    if user_data:
+        response_data = {"isDuplicate" : True}
+        return jsonify(response_data)
+    else:
+        response_data = {"isDuplicate" : False}
+        return jsonify(response_data)
 
 
 # [GET] /user?nickname=
@@ -213,7 +264,7 @@ def ready(data):
             print("add player at prev_matcing")
             prev_game_match.add_player(player)
             send_match_player_info(player, prev_game_match)
-    # 새로운 대기방 만들기
+    # 새로운 매칭 만들기
     else:
         print("new matching")
         game_match = GameMatch(GAME_MATCH_CNT)
@@ -309,6 +360,7 @@ def enter_game_room(data):
         print(f"User not found: {nickname}")
 
 
+# [SOCKET] bingo
 # 빙고 버튼 클릭.
 # 빙고가 맞으면 게임 끝
 # 아니면 계속 게임하기.

@@ -6,8 +6,10 @@ CREATE TABLE user (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     nickname VARCHAR(50) NOT NULL,
     password VARCHAR(50) NOT NULL,
+    referral INT,
     win INT DEFAULT 0,
-    lose INT DEFAULT 0
+    lose INT DEFAULT 0,
+    FOREIGN KEY (referral) REFERENCES user(user_id)
 );
 
 CREATE TABLE bingo_game_room (

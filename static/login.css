@@ -90,3 +90,9 @@ body {
 #login-button:hover {
     background-color: #3f5d99;
 }
+
+#signup-link {
+    cursor: pointer; 
+    color: gray; 
+    text-decoration: underline;
+}

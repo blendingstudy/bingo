@@ -1,16 +1,9 @@
-let inputNickname;  // Declare userNickname variable here
-let inputPW;
 
-document.getElementById('login-button').addEventListener('click', function() {
+function login() {
     inputNickname = document.getElementById('nickname-input').value;  // Assign value to userNickname here
-    document.getElementById('nickname-input').value = "";
     inputPW = document.getElementById('password-input').value;  // Assign value to userNickname here
-    document.getElementById('password-input').value = "";
 
     console.log("입장 버튼 누름!")
-    
-    // Emit 'login' event to server with the entered nickname
-    // socket.emit('login', {nickname: userNickname});
 
     const data = {
         "nickname": inputNickname,
@@ -24,17 +17,27 @@ document.getElementById('login-button').addEventListener('click', function() {
         },
         body: JSON.stringify(data) // 전송할 데이터를 JSON 문자열로 변환하여 요청 본문에 포함
     })
-        .then(response => response.json()) // 응답을 JSON 형식으로 파싱
-        .then(data => {
-            // 응답 데이터 처리
-            console.log(data)
-            localStorage.setItem('nickname', inputNickname);  // Now userNickname is accessible here
-            localStorage.setItem('userId', data.user_id);
-            window.location.href = '/mypage';
-        })
-        .catch(error => {
-            // 에러 처리
-            alert("로그인 에러!");
-        });
+    .then(response => {
+        if(!response.ok){
+            throw new Error("login fail")
+        }
+        return response.json(); // 응답을 JSON 형식으로 파싱
+    }) 
+    .then(data => {
+        // 응답 데이터 처리
+        console.log(data)
+        localStorage.setItem('nickname', inputNickname);  // Now userNickname is accessible here
+        localStorage.setItem('userId', data.user_id);
+        window.location.href = '/mypage';
+    })
+    .catch(error => {
+        alert("로그인 에러!");
+    });
       
-});
+    document.getElementById('nickname-input').value = "";
+    document.getElementById('password-input').value = "";
+};
+
+function moveSignupPage(){
+    window.location.href = '/signup'; // 파이썬 플라스크 서버에 해당 URL이 정의되어 있어야 합니다.
+}
