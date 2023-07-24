@@ -9,7 +9,7 @@ CREATE TABLE user (
     referral INT,
     win INT DEFAULT 0,
     lose INT DEFAULT 0,
-    prfile_img VARCHAR(500),
+    profile_img VARCHAR(500),
     FOREIGN KEY (referral) REFERENCES user(user_id)
 );
 
