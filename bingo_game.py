@@ -6,6 +6,7 @@ from bingo_data import BingoData
 import sched
 import time
 import pymysql.cursors
+from bingo_dao import BingoDao
 
 class BingoGame:
     def __init__(self, game_room_num):
@@ -15,14 +16,8 @@ class BingoGame:
         self.scheduler = sched.scheduler(time.time, time.sleep)
         self.random_numbers = []
         self.is_game_over = False
-        self.connection = pymysql.connect(host=BingoData.MYSQL_HOST,
-                             user=BingoData.MYSQL_USER,
-                             password=BingoData.MYSQL_PW,
-                             db=BingoData.MYSQL_DB,
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
+        self.bingoDao = BingoDao()
 
-    
     def get_game_room_num(self):
         return self.game_room_num
     
@@ -101,7 +96,6 @@ class BingoGame:
             raise ValueError("Error: Not enough players to start the game.")
 
         #2초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
-        random.sample(range(1, BingoData.BINGO_MAX_NUMBER + 1), 25) # 이유는 모르겠는데 항상 늦게 들어온 플레이어가 이길 확률이 높아서 코드 넣어봄.
         self.scheduler.enter(0, 1, self.generate_random_number, ())  # 함수 호출 시작
         self.scheduler.run()
 
@@ -145,18 +139,14 @@ class BingoGame:
     # 게임 끝
     def game_over(self, winner):
         self.is_game_over = True
+        self.bingoDao.game_over(self.game_room_num)
 
         for player in self.players.values():
             if player == winner:
                 winner.win()
                 emit("bingoGameOver", {"isWin": True}, room=player.get_sid())
 
-                with self.connection.cursor() as cursor:
-                    # Increase the win count in the database for the user_id
-                    sql_query = "UPDATE game_member SET is_win = 1 WHERE player_id = %s and bingo_game_room_id = %s"
-                    values = (winner.get_id(), self.game_room_num, )
-                    cursor.execute(sql_query, values)
-                    self.connection.commit()
+                self.bingoDao.win_bingo_game(winner, self.game_room_num)
             else:
                 player.lose()
                 emit("bingoGameOver", {"isWin": False}, room=player.get_sid())

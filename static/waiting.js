@@ -97,7 +97,7 @@ socket.on('newPlayerMatched', function(data) {
     opp_player = document.getElementsByClassName("profile-box opponent-profile")
     opp_player.item(data.idx-2).innerHTML = `
         <div class="profile-picture">
-            <!-- Profile picture will go here -->
+            <img class="profile-image" src=${data.opp_profile_img} alt="프로필 이미지">
         </div>
         <div class="profile-info">
             <h2>${data.opp_nickname}</h2>

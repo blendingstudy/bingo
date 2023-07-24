@@ -116,6 +116,7 @@ function checkNicknameDuplicate(){
         console.log(data)
         if(data.isDuplicate){
             errorMessageForNickname.textContent = "중복된 닉네임 입니다."
+            isCheckPasswordDuplicate = false;
         }
         else{
             errorMessageForNickname.textContent = "사용 가능한 닉네임 입니다."

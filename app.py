@@ -9,6 +9,7 @@ from bingo_data import BingoData
 import pymysql.cursors
 from game_match import GameMatch
 import random
+from bingo_dao import BingoDao
 
 app = Flask(__name__)
 
@@ -20,18 +21,20 @@ Session(app)
 
 socketio = SocketIO(app, manage_session=False)
 
-# Connect to the database
-connection = pymysql.connect(host=BingoData.MYSQL_HOST,
-                             user=BingoData.MYSQL_USER,
-                             password=BingoData.MYSQL_PW,
-                             db=BingoData.MYSQL_DB,
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
-
 client_sessions = {}
 bingo_games = {}
 game_matchs = {}
 GAME_MATCH_CNT = 1
+
+connection = pymysql.connect(host=BingoData.MYSQL_HOST,
+                                    user=BingoData.MYSQL_USER,
+                                    password=BingoData.MYSQL_PW,
+                                    db=BingoData.MYSQL_DB,
+                                    charset='utf8mb4',
+                                    cursorclass=pymysql.cursors.DictCursor,
+                                    autocommit=True)
+
+bingoDao = BingoDao()
 
 # Matchmaking queue
 waiting_queue = Queue()
@@ -78,10 +81,8 @@ def loginApi():
     password = data.get("password")
 
     # 데이터베이스에서 해당 nickname과 pw를 가진 유저 조회
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM user WHERE nickname = %s and password = %s", (nickname, password, ))
+    user_data = bingoDao.login(nickname, password)
     
-    user_data = cursor.fetchone()
     print(user_data)
     if user_data:
         # 조회된 유저 정보를 사용하여 User 객체 생성 및 등록
@@ -107,10 +108,8 @@ def signup():
     referral = data.get("referral")
 
     # 데이터베이스에서 해당 nickname을 가진 유저 조회
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM user WHERE nickname = %s", (nickname, ))
-    
-    user_data = cursor.fetchone()
+    user_data = bingoDao.find_user_by_nickname(nickname)
+
     print(user_data)
     if user_data: # 이미 가입된 유저 닉네임
         print("user is already exist")
@@ -119,29 +118,17 @@ def signup():
         # 추천인 조회
         referral_user_id = None
         if referral:
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT * FROM user WHERE nickname = %s", (referral, ))
-            
-            referral_user_data = cursor.fetchone()
+            referral_user_data = bingoDao.find_user_by_nickname(referral)
             if referral_user_data:
                 referral_user_id = referral_user_data['user_id']
         
-        # 프로필 이미지 설정
-        random_number = random.randint(0, len(BingoData.PROFILE_IMG_LIST))
-        random_profile_img = BingoData.PROFILE_IMG_LIST[random_number]
-
         # 회원가입
-        with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO user (nickname, password, referral, profile_img) VALUES (%s, %s, %s, %s)", (nickname, password, referral_user_id, random_profile_img, ))
-            connection.commit()
-
-            user_id = cursor.lastrowid
-            user = User(user_id, nickname, 0, 0, random_profile_img)
-            client_sessions[nickname] = user
-            print(f"new user signup success(회원가입 성공): {nickname}")
+        signupUser = bingoDao.save_user(nickname, password, referral_user_id)
+        client_sessions[nickname] = User(signupUser['user_id'], nickname, 0, 0, signupUser['profile_img'])
+        print(f"new user signup success(회원가입 성공): {nickname}")
 
         # 응답
-        response_data = {"userId" : user_id}
+        response_data = {"userId" : signupUser['user_id']}
         return jsonify(response_data)
 
 
@@ -151,10 +138,7 @@ def signup():
 def checkNicknameDuplicate():
     nickname = request.args.get('nickname')
 
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM user WHERE nickname = %s", (nickname, ))
-    
-    user_data = cursor.fetchone()
+    user_data = bingoDao.find_user_by_nickname(nickname)
 
     if user_data:
         response_data = {"isDuplicate" : True}
@@ -185,18 +169,18 @@ def userInfo():
         return jsonify(error_message), 500
 
 
-@app.route('/userRead')
-def user_read():
-    # 데이터베이스 쿼리
-    with connection.cursor() as cursor:
-        cursor.execute('SELECT * FROM user')
-        results = cursor.fetchall()
+# @app.route('/userRead')
+# def user_read():
+#     # 데이터베이스 쿼리
+#     with connection.cursor() as cursor:
+#         cursor.execute('SELECT * FROM user')
+#         results = cursor.fetchall()
 
-    # 결과 출력
-    for row in results:
-        print(row)
+#     # 결과 출력
+#     for row in results:
+#         print(row)
 
-    return 'MySQL 연동 예시'
+#     return 'MySQL 연동 예시'
 
 
 # [GET] /test
@@ -213,16 +197,13 @@ def find_user(nickname):
         return client_sessions[nickname]
 
     # 데이터베이스에서 해당 nickname을 가진 유저 조회
-    with connection.cursor() as cursor:
-        sql_query = "SELECT * FROM user WHERE nickname = %s"
-        cursor.execute(sql_query, (nickname,))
-        user_data = cursor.fetchone()
+    user_data = bingoDao.find_user_by_nickname(nickname)
 
-        if user_data:
-            # 조회된 유저 정보를 사용하여 User 객체 생성
-            user = User(user_data['user_id'], nickname, user_data['win'], user_data['lose'], user_data['profile_img'])
-            client_sessions[nickname] = user  # client_sessions에 추가
-            return user
+    if user_data:
+        # 조회된 유저 정보를 사용하여 User 객체 생성
+        user = User(user_data['user_id'], nickname, user_data['win'], user_data['lose'], user_data['profile_img'])
+        client_sessions[nickname] = user  # client_sessions에 추가
+        return user
 
     # 유저를 찾지 못한 경우 None 반환
     return None
@@ -288,7 +269,7 @@ def send_match_player_info(player, game_match):
     # 새로운 플레이어의 정보 전달
     for opp in game_match.get_players().values():
         if opp != player:
-            response_data = {"leader": game_match.get_leader() == opp, "game_match_num": game_match.get_id(), "opp_nickname": player.get_nickname(), "opp_record": player.get_record(), "idx": game_match.num_of_wating_player()}
+            response_data = {"leader": game_match.get_leader() == opp, "game_match_num": game_match.get_id(), "opp_nickname": player.get_nickname(), "opp_record": player.get_record(), "opp_profile_img": player.get_profile_img(), "idx": game_match.num_of_wating_player()}
             emit('newPlayerMatched', response_data, room=opp.get_sid())
     
     # 새로운 플레이어에게 이전 매칭된 플레이어 정보 전달
@@ -323,17 +304,7 @@ def start_game(data):
 
 def create_game_room(game_match):
     # MySQL 데이터베이스에 게임방 생성
-    status = "WAITING"
-    with connection.cursor() as cursor:
-        cursor.execute("INSERT INTO bingo_game_room (status) VALUES (%s)", (status,))
-        connection.commit()
-        game_room_id = cursor.lastrowid
-
-    # 게임 멤버 테이블에 게임룸 ID와 유저 ID 추가
-    with connection.cursor() as cursor:
-        for player in game_match.get_players().values():
-            cursor.execute("INSERT INTO game_member (bingo_game_room_id, player_id) VALUES (%s, %s)", (game_room_id, player.get_id()))
-            connection.commit()
+    game_room_id = bingoDao.save_game_room(game_match.get_players())
 
     # 게임방 만들기
     bingo_game = BingoGame(game_room_id)
