@@ -28,7 +28,6 @@ class BingoDao:
             self.connection.commit()
 
         user_id = cursor.lastrowid
-        print(f"new user signup success(회원가입 성공): {nickname}")
 
         return self.find_user_by_id(user_id)
 

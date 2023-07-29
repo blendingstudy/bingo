@@ -4,164 +4,211 @@
     <title>Game</title>
     <!-- <link rel="stylesheet" href="../static/style.css"> -->
     <script src="https://cdn.socket.io/4.2.0/socket.io.js"></script>
-    <script src="/static/game.js" defer></script>
     <link rel="stylesheet" href="/static/game.css">
+    <script src="/static/game.js" defer></script>
+    <link rel="stylesheet" href="/static/waiting.css">
 </head>
 <body>
-<div id="game">
-    <div id="game-container">
-        <div id="temp">
-            <!-- Section 1: Opponent's profile and bingo board -->
-            <div class="player-section-1 opponent">
-                <div class="player-section opponent">
-                    <div class="profile-section">
-                        <!-- Profile related code here -->
-                        <div class="profile-section-picture">
-                            <!-- Profile picture will go here -->
-                        </div>
-                        <div class="nickname"></div>
-                        <div class="record"></div>
+    <div id="waiting">
+        <div id="waiting-page">
+            <div class="countdown-section">
+                <div id="countdown-bar"></div>
+            </div>
+            <div class="profiles-section">
+                <div class="opponent-profiles">
+                    <div class="profile-box opponent-profile">
+                        <!-- Opponent's profile 1 will go here -->
                     </div>
-                    <div class="bingo-container">
-                        <div class="bingo-board">
-                            <!-- Bingo board will be filled dynamically -->
-                        </div>
-                        <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
+                    <div class="profile-box opponent-profile">
+                        <!-- Opponent's profile 2 will go here -->
                     </div>
-                </div>
-                <div class="player-section opponent">
-                    <div class="profile-section">
-                        <!-- Profile related code here -->
-                        <div class="profile-section-picture">
-                            <!-- Profile picture will go here -->
-                        </div>
-                        <div class="nickname"></div>
-                        <div class="record"></div>
+                    <div class="profile-box opponent-profile">
+                        <!-- Opponent's profile 3 will go here -->
                     </div>
-                    <div class="bingo-container">
-                        <div class="bingo-board">
-                            <!-- Bingo board will be filled dynamically -->
-                        </div>
-                        <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
+                    <div class="profile-box opponent-profile">
+                        <!-- Opponent's profile 4 will go here -->
+                    </div>
+                    <div class="profile-box opponent-profile">
+                        <!-- Opponent's profile 5 will go here -->
+                    </div>
+                    <div class="profile-box opponent-profile">
+                        <!-- Opponent's profile 6 will go here -->
                     </div>
                 </div>
-                <div class="player-section opponent">
-                    <div class="profile-section">
-                        <!-- Profile related code here -->
-                        <div class="profile-section-picture">
-                            <!-- Profile picture will go here -->
-                        </div>
-                        <div class="nickname"></div>
-                        <div class="record"></div>
+    
+                <div class="vs-text">VS</div>
+    
+                <div class="profile-box own-profile">
+                    <div class="profile-picture">
+                        <!-- Your profile picture will go here -->
                     </div>
-                    <div class="bingo-container">
-                        <div class="bingo-board">
-                            <!-- Bingo board will be filled dynamically -->
-                        </div>
-                        <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
+                    <div class="profile-info">
+                        <h2 id="own-nickname">Your Nickname</h2>
+                        <h3>전적</h3>
+                        <p id="own-record">0승 0패</p>
                     </div>
                 </div>
             </div>
-
-
-            <!-- Ball drawing section -->
-            <div id="ball-drawing-section">
-                <div class="ball-container">
-                    <!-- Balls will be filled dynamically -->
-                </div>
-                <div class="recent-balls">
-                    <!-- Recent balls will be filled dynamically -->
-                </div>
-            </div>
-
-            
-            <!-- Section 2: Opponent's profile and bingo board -->
-            <div class="player-section-2 opponent">
-                <div class="player-section opponent">
-                    <div class="bingo-container">
-                        <div class="bingo-board">
-                            <!-- Bingo board will be filled dynamically -->
-                        </div>
-                        <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
-                    </div>
-                    <div class="profile-section">
-                        <!-- Profile related code here -->
-                        <div class="profile-section-picture">
-                            <!-- Profile picture will go here -->
-                        </div>
-                        <div class="nickname"></div>
-                        <div class="record"></div>
-                    </div>
-                </div>
-                <div class="player-section opponent">
-                    <div class="bingo-container">
-                        <div class="bingo-board">
-                            <!-- Bingo board will be filled dynamically -->
-                        </div>
-                        <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
-                    </div>
-                    <div class="profile-section">
-                        <!-- Profile related code here -->
-                        <div class="profile-section-picture">
-                            <!-- Profile picture will go here -->
-                        </div>
-                        <div class="nickname"></div>
-                        <div class="record"></div>
-                    </div>
-                </div>
-                <div class="player-section opponent">
-                    <div class="bingo-container">
-                        <div class="bingo-board">
-                            <!-- Bingo board will be filled dynamically -->
-                        </div>
-                        <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
-                    </div>
-                    <div class="profile-section">
-                        <!-- Profile related code here -->
-                        <div class="profile-section-picture">
-                            <!-- Profile picture will go here -->
-                        </div>
-                        <div class="nickname"></div>
-                        <div class="record"></div>
-                    </div>
-                </div>
+            <div class="ready-button-section">
+                <button id="ready-button" onclick="startGame()" disabled>게임시작!</button>
             </div>
         </div>
-        
-
-        <!-- Section 3: User's profile and bingo board -->
-        <div class="player-section-3 user">
-            <div class="bingo-container">
-                <div class="bingo-board">
-                    <!-- Bingo board will be filled dynamically -->
-                </div>
-                <button id="my-bingo-button" class="bingo-button user-button" onclick="clickBingoButton()">B<br>I<br>N<br>G<br>O</button>
-            </div>
-            <div class="profile-section">
-                <!-- Profile related code here -->
-                <div class="profile-section-picture">
-                    <!-- Profile picture will go here -->
-                </div>
-                <div class="nickname"></div>
-                <div class="record"></div>
-            </div>
-        </div>
-        
-        <div id="gameOverModal">
-            <div id="gameOverModalContent">
-                <div class="modal-header" id="gameOverModalHeader">
-                    <!-- Victory or Defeat will be inserted here -->
-                </div>
-                <div class="modal-body" id="gameOverModalBody">
-                    <!-- A custom message will be inserted here -->
-                </div>
-                <div class="modal-footer">
-                    <button id="gameOverModalButton" onclick="moveMypage()">마이페이지로 돌아가기</button>
-                </div>
-            </div>
-        </div> 
-        
     </div>
-</div>
+
+    <div id="game" style="display: none;">
+        <div id="game-container">
+            <div id="temp">
+                <!-- Section 1: Opponent's profile and bingo board -->
+                <div class="player-section-1 opponent">
+                    <div class="player-section opponent">
+                        <div class="profile-section">
+                            <!-- Profile related code here -->
+                            <div class="profile-section-picture">
+                                <!-- Profile picture will go here -->
+                            </div>
+                            <div class="nickname"></div>
+                            <div class="record"></div>
+                        </div>
+                        <div class="bingo-container">
+                            <div class="bingo-board">
+                                <!-- Bingo board will be filled dynamically -->
+                            </div>
+                            <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
+                        </div>
+                    </div>
+                    <div class="player-section opponent">
+                        <div class="profile-section">
+                            <!-- Profile related code here -->
+                            <div class="profile-section-picture">
+                                <!-- Profile picture will go here -->
+                            </div>
+                            <div class="nickname"></div>
+                            <div class="record"></div>
+                        </div>
+                        <div class="bingo-container">
+                            <div class="bingo-board">
+                                <!-- Bingo board will be filled dynamically -->
+                            </div>
+                            <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
+                        </div>
+                    </div>
+                    <div class="player-section opponent">
+                        <div class="profile-section">
+                            <!-- Profile related code here -->
+                            <div class="profile-section-picture">
+                                <!-- Profile picture will go here -->
+                            </div>
+                            <div class="nickname"></div>
+                            <div class="record"></div>
+                        </div>
+                        <div class="bingo-container">
+                            <div class="bingo-board">
+                                <!-- Bingo board will be filled dynamically -->
+                            </div>
+                            <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
+                        </div>
+                    </div>
+                </div>
+    
+    
+                <!-- Ball drawing section -->
+                <div id="ball-drawing-section">
+                    <div class="ball-container">
+                        <!-- Balls will be filled dynamically -->
+                    </div>
+                    <div class="recent-balls">
+                        <!-- Recent balls will be filled dynamically -->
+                    </div>
+                </div>
+    
+                
+                <!-- Section 2: Opponent's profile and bingo board -->
+                <div class="player-section-2 opponent">
+                    <div class="player-section opponent">
+                        <div class="bingo-container">
+                            <div class="bingo-board">
+                                <!-- Bingo board will be filled dynamically -->
+                            </div>
+                            <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
+                        </div>
+                        <div class="profile-section">
+                            <!-- Profile related code here -->
+                            <div class="profile-section-picture">
+                                <!-- Profile picture will go here -->
+                            </div>
+                            <div class="nickname"></div>
+                            <div class="record"></div>
+                        </div>
+                    </div>
+                    <div class="player-section opponent">
+                        <div class="bingo-container">
+                            <div class="bingo-board">
+                                <!-- Bingo board will be filled dynamically -->
+                            </div>
+                            <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
+                        </div>
+                        <div class="profile-section">
+                            <!-- Profile related code here -->
+                            <div class="profile-section-picture">
+                                <!-- Profile picture will go here -->
+                            </div>
+                            <div class="nickname"></div>
+                            <div class="record"></div>
+                        </div>
+                    </div>
+                    <div class="player-section opponent">
+                        <div class="bingo-container">
+                            <div class="bingo-board">
+                                <!-- Bingo board will be filled dynamically -->
+                            </div>
+                            <!-- <button disabled class="bingo-button opponent-button" disabled>B<br>I<br>N<br>G<br>O</button> -->
+                        </div>
+                        <div class="profile-section">
+                            <!-- Profile related code here -->
+                            <div class="profile-section-picture">
+                                <!-- Profile picture will go here -->
+                            </div>
+                            <div class="nickname"></div>
+                            <div class="record"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+    
+            <!-- Section 3: User's profile and bingo board -->
+            <div class="player-section-3 user">
+                <div class="bingo-container">
+                    <div class="bingo-board">
+                        <!-- Bingo board will be filled dynamically -->
+                    </div>
+                    <button id="my-bingo-button" class="bingo-button user-button" onclick="clickBingoButton()">B<br>I<br>N<br>G<br>O</button>
+                </div>
+                <div class="profile-section">
+                    <!-- Profile related code here -->
+                    <div class="profile-section-picture">
+                        <!-- Profile picture will go here -->
+                    </div>
+                    <div class="nickname"></div>
+                    <div class="record"></div>
+                </div>
+            </div>
+            
+            <div id="gameOverModal">
+                <div id="gameOverModalContent">
+                    <div class="modal-header" id="gameOverModalHeader">
+                        <!-- Victory or Defeat will be inserted here -->
+                    </div>
+                    <div class="modal-body" id="gameOverModalBody">
+                        <!-- A custom message will be inserted here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button id="gameOverModalButton" onclick="moveMypage()">마이페이지로 돌아가기</button>
+                    </div>
+                </div>
+            </div> 
+            
+        </div>
+    </div>
 </body>
 </html>
