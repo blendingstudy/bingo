@@ -58,11 +58,10 @@ def mypage_page():
 def game_room_list_page():
     return render_template('game_room_list.html')
 
-
 # 대기 페이지
-@app.route('/waiting')
-def waiting_page():
-    return render_template('waiting.html')
+# @app.route('/waiting')
+# def waiting_page():
+#     return render_template('waiting.html')
 
 # 게임 페이지
 @app.route('/game')
@@ -365,4 +364,4 @@ def bingo(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True)
