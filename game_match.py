@@ -39,9 +39,9 @@ class GameMatch:
     def remove_player(self, sid):
         if sid in self.players.keys():
             del self.players[sid]
-            print(f"{sid}이(가) 매칭에서 제거되었습니다.")
+            print(f"{sid}is remove at match!!!!")
         else:
-            print(f"{sid}을(를) 찾을 수 없습니다.")
+            print(f"{sid}can't find at match!!!")
 
     def display_players(self):
         if self.players:

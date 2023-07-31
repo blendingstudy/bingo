@@ -227,13 +227,9 @@ def on_disconnect():
             print("Remove player at match by Client disconneted")
 
             for player_sid in game_match.get_players().keys():
-                emit("playerOutOfMatch")
-                for opp_sid in game_match.get_players().keys():
-                    if opp_sid != player_sid and player_sessions[opp_sid]:
-                        opp = player_sessions[opp_sid]
-                        response_data = {"leader": game_match.get_leader_sid() == opp_sid, "game_match_num": game_match.get_id(), "opp_nickname": player.get_nickname(), "opp_record": player.get_record(), "opp_profile_img": player.get_profile_img(), "idx": game_match.num_of_wating_player()}
-                        emit('newPlayerMatched', response_data, room=opp.get_sid())
-
+                emit("playerOutOfMatch", room=player_sid)
+                print("out player!!!!")
+                
     if request.sid in player_sessions.keys() or player_sessions[request.sid]:
         print("Remove player at sessions by Client disconneted")
         del player_sessions[request.sid]
@@ -265,6 +261,21 @@ def set_sid(data):
         print(f"Set SID for user: {nickname}, SID: {request.sid}")
     else:
         print(f"User not found: {nickname}")
+
+# 게임 매칭정보 요청
+@socketio.on('resendPlayerMathcInfo', namespace='/')
+def resend_player_match_info(data):
+    game_match_num = data["game_match_num"]
+    game_match = game_matchs[game_match_num]
+
+    player = player_sessions[request.sid]
+
+    for opp_sid in game_match.get_players().keys():
+        if opp_sid != request.sid and player_sessions[opp_sid]:
+            opp = player_sessions[opp_sid]
+            response_data = {"leader": game_match.get_leader_sid() == opp_sid, "game_match_num": game_match.get_id(), "opp_nickname": player.get_nickname(), "opp_record": player.get_record(), "opp_profile_img": player.get_profile_img(), "idx": game_match.num_of_wating_player()}
+            emit('newPlayerMatched', response_data, room=opp.get_sid())
+
 
 
 # [SOCKET] waiting

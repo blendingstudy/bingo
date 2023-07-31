@@ -98,6 +98,11 @@ class BingoGame:
         if len(self.players) < BingoData.MIN_PLAYER_SIZE:
             raise ValueError("Error: Not enough players to start the game.")
 
+        # 겹치는 플레이어가 있는지 확인하고 삭제해야함!
+        # for player_a in self.players.values():
+        #     for player_b in self.players.values():
+
+
         #2초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
         self.scheduler.enter(0, 1, self.generate_random_number, ())  # 함수 호출 시작
         self.scheduler.run()
