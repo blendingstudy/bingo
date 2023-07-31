@@ -1,17 +1,14 @@
-const socket = io() // 웹소켓 초기화
 const MAX_BALLS_DISPLAYED = 6;
-let gameRoomNum; // 게임방 번호
 const nickname = localStorage.getItem("nickname") // 닉네임
+let gameRoomNum; // 게임방 번호
 let myBingoCardCells;
 let gameOver = false;
-const WAITING_PAGE = 0;
-
-console.log("닉네임: " + nickname)
-
-let userNickname = localStorage.getItem('nickname');  // Retrieve nickname from local storage
+let opp_player_idx = 0
 let gameMatchNum;
 
-// resetSID();
+console.log("닉네임: " + nickname)
+const socket = io() // 웹소켓 초기화
+
 setSID();
 setTimeout(() => {
     waiting();
@@ -27,6 +24,7 @@ function resetSID(){
     socket.emit("resetSID", data)
 }
 
+// sid 세팅
 function setSID(){
     const data = {
         "nickname" : nickname
@@ -36,9 +34,9 @@ function setSID(){
 }
 
 function getUserInfo(){
-    console.log("유저정보 요청 시도:", userNickname)
+    console.log("유저정보 요청 시도:", nickname)
 
-    const url = "http://localhost:5000/user?nickname=" + userNickname 
+    const url = "http://localhost:5000/user?nickname=" + nickname 
 
     fetch(url, {
         method: 'GET',
@@ -70,12 +68,12 @@ function getUserInfo(){
 }
 
 function waiting(){
-    const data = {"nickname" : userNickname}
+    const data = {"nickname" : nickname}
 
     socket.emit('waiting', data)
 }
 
-let opp_player_idx = 0
+
 // 이전 매칭된 플레이어의 정보
 socket.on('gameMatchComplete', function(data) {
 
