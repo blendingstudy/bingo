@@ -9,7 +9,6 @@ class User:
         self.id = id
         self.nickname = nickname
         self.bingo_card = None
-        self.sid = None
         self.record = {'win': win, 'lose': lose}
         self.profile_img = profile_img
         self.game_match_num = 0
@@ -29,9 +28,6 @@ class User:
     def get_bingo_card(self):
         return self.bingo_card.get_card()
 
-    def get_sid(self):
-        return self.sid
-
     def get_id(self):
         return self.id
 
@@ -40,9 +36,6 @@ class User:
 
     def get_game_match_num(self):
         return self.game_match_num
-
-    def set_sid(self, sid):
-        self.sid = sid
 
     def set_game_match_num(self, game_match_num):
         print("game match num:", game_match_num)

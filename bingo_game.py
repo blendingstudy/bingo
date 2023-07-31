@@ -69,8 +69,8 @@ class BingoGame:
 
     # 플레이어 설정
     def set_players(self, players):
-        for player in players.values():
-            self.players[player.get_sid()] = player
+        for player_sid, player in players.items():
+            self.players[player_sid] = player
         self.generate_players_bingo_card()
 
     # 플레이어들의 빙고판 생성
@@ -96,11 +96,18 @@ class BingoGame:
         print("-----bingo game start!!-----")
 
         if len(self.players) < BingoData.MIN_PLAYER_SIZE:
+            print("size of match:",len(self.players))
             raise ValueError("Error: Not enough players to start the game.")
 
         # 겹치는 플레이어가 있는지 확인하고 삭제해야함!
-        # for player_a in self.players.values():
-        #     for player_b in self.players.values():
+        for player_a_sid in self.players.keys():
+            player_a = self.players[player_a_sid]
+            count = 0
+            for player_b in self.players.values():
+                if player_a == player_b:
+                    count += 1
+            if count > 1:
+                del self.players[player_a_sid]
 
 
         #2초마다 랜덤 넘버 뽑고, 빙고판에 있는지 확인.
@@ -113,17 +120,18 @@ class BingoGame:
         self.random_numbers.append(number)
 
         # 내 빙고판에 숫자가 있는지 확인.
-        for player in self.players.values():
-            isChecked, x, y = player.check_number(number)
+        for player_sid in self.players.keys():
+            player = self.players[player_sid]
+            isChecked, x, y = player.check_number(number) # 빙고가 됐는지 확인
             response_data = {"num":number, "isChecked":isChecked, "x":x, "y":y}
-            emit("generateRandomNumber", response_data, room=player.get_sid())
+            emit("generateRandomNumber", response_data, room=player_sid)
 
             #내 빙고판에 숫자가 있으면 상대방에게 알려줘야함.
             if isChecked:
-                for opp in self.players.values():
-                    if opp != player :
+                for opp_sid in self.players.keys():
+                    if opp_sid != player_sid :
                         response_data = {"playerId":  player.get_id(), "x": x, "y": y}
-                        emit("oppCheckBingoCell", response_data, room=opp.get_sid())
+                        emit("oppCheckBingoCell", response_data, room=opp_sid)
 
         # 99개 다 발표하면 종료 || 게임이 종료되면
         if len(self.random_numbers) == BingoData.BINGO_MAX_NUMBER or self.is_game_over:
@@ -133,28 +141,29 @@ class BingoGame:
 
 
     # 빙고가 됐는지 확인
-    def check_bingo(self, player):
-        if player in self.players.values():
+    def check_bingo(self, player_sid):
+        if player_sid in self.players.keys():
+            player = self.players[player_sid]
             result = player.check_bingo()
 
             # 두줄 빙고 완성
             if result:
-                self.game_over(player)
+                self.game_over(player_sid)
 
             return result
 
 
     # 게임 끝
-    def game_over(self, winner):
+    def game_over(self, winner_sid):
         self.is_game_over = True
         self.bingoDao.game_over(self.game_room_num)
 
-        for player in self.players.values():
-            if player == winner:
-                winner.win()
-                emit("bingoGameOver", {"isWin": True}, room=player.get_sid())
+        for player_sid, player in self.players.items():
+            if player_sid == winner_sid:
+                player.win()
+                emit("bingoGameOver", {"isWin": True}, room=player_sid)
 
-                self.bingoDao.win_bingo_game(winner, self.game_room_num)
+                self.bingoDao.win_bingo_game(player, self.game_room_num)
             else:
                 player.lose()
-                emit("bingoGameOver", {"isWin": False}, room=player.get_sid())
+                emit("bingoGameOver", {"isWin": False}, room=player_sid)

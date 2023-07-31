@@ -5,15 +5,13 @@ const nickname = localStorage.getItem("nickname") // 닉네임
 let myBingoCardCells;
 let gameOver = false;
 const WAITING_PAGE = 0;
-const GAME_PAGE = 1;
-let pageStatus = WAITING_PAGE;
 
 console.log("닉네임: " + nickname)
 
 let userNickname = localStorage.getItem('nickname');  // Retrieve nickname from local storage
 let gameMatchNum;
 
-resetSID();
+// resetSID();
 setSID();
 setTimeout(() => {
     waiting();
@@ -165,7 +163,6 @@ socket.on("moveGamePage", (data) => {
     startCountdown();
     setTimeout(() => {
         changePageFromWaitingToGame();
-        pageStatus = GAME_PAGE;
     }, 3000);
     
 })
@@ -380,9 +377,12 @@ function displayBall(selector, ball, color) {
 
     if (selector === '.recent-balls') {
         if (container.childElementCount >= MAX_BALLS_DISPLAYED) {
+            for(let i=0; i<container.childElementCount-MAX_BALLS_DISPLAYED; i++){ // 넘치게 있었으면 다 삭제
+                container.removeChild(container.lastElementChild);
+            }
             setTimeout(() => {  // Add a delay before removing the oldest ball
                 container.removeChild(container.lastElementChild);
-            }, 2005);  // Delay time in milliseconds (505ms = 0.505s)
+            }, 2000);  // Delay time in milliseconds (505ms = 0.505s)
         }
         setTimeout(() => {
             ballElement.style.animation = "slideDown 0.5s ease-out";  // Make the animation faster
@@ -421,16 +421,3 @@ function openModal(isUserVictory) {
 function moveMypage(){
     window.location.href = '/mypage';
 }
-
-// 페이지가 로드될 때 이벤트 리스너를 등록합니다.
-window.onload = function() {
-    // 페이지가 새로고침될 때 발생하는 이벤트 리스너를 등록합니다.
-    if (pageStatus == GAME_PAGE){
-        window.addEventListener('beforeunload', function(event) {
-            // 이벤트가 발생할 때 Alert 창을 띄웁니다.
-            event.preventDefault(); // 이벤트 기본 동작을 막습니다.
-            event.returnValue = ''; // 이벤트 리스너에서 반환 값을 빈 문자열로 설정하여 브라우저가 경고 창을 표시하도록 합니다.
-            alert('페이지를 떠나시겠습니까?');
-        });
-    }
-};

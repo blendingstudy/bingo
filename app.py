@@ -238,18 +238,20 @@ def on_disconnect():
 
 # [SOCKET] resetSID
 # 유저의 sid 다시 설정
-@socketio.on("resetSID", namespace='/')
-def reset_sid(data):
-    nickname = data["nickname"]
-    user = find_user(nickname)  # 유저를 find_user() 메소드로 찾음
+# @socketio.on("resetSID", namespace='/')
+# def reset_sid(data):
+#     nickname = data["nickname"]
+#     user = find_user(nickname)  # 유저를 find_user() 메소드로 찾음
 
-    if user:
-        user.set_sid(request.sid)
-        print(f"Reset SID for user: {nickname}, SID: {request.sid}")
-    else:
-        print(f"User not found: {nickname}")
+#     if user:
+#         user.set_sid(request.sid)
+#         print(f"Reset SID for user: {nickname}, SID: {request.sid}")
+#     else:
+#         print(f"User not found: {nickname}")
 
 
+# [SOCKET] setSID
+# 유저의 sid 설정
 @socketio.on("setSID", namespace='/')
 def set_sid(data):
     nickname = data["nickname"]
@@ -257,7 +259,6 @@ def set_sid(data):
 
     if user:
         player_sessions[request.sid] = user
-        user.set_sid(request.sid)
         print(f"Set SID for user: {nickname}, SID: {request.sid}")
     else:
         print(f"User not found: {nickname}")
@@ -274,7 +275,7 @@ def resend_player_match_info(data):
         if opp_sid != request.sid and player_sessions[opp_sid]:
             opp = player_sessions[opp_sid]
             response_data = {"leader": game_match.get_leader_sid() == opp_sid, "game_match_num": game_match.get_id(), "opp_nickname": player.get_nickname(), "opp_record": player.get_record(), "opp_profile_img": player.get_profile_img(), "idx": game_match.num_of_wating_player()}
-            emit('newPlayerMatched', response_data, room=opp.get_sid())
+            emit('newPlayerMatched', response_data, room=opp_sid)
 
 
 
@@ -318,14 +319,14 @@ def send_match_player_info(sid, player, game_match):
         if opp_sid != sid and player_sessions[opp_sid]:
             opp = player_sessions[opp_sid]
             response_data = {"leader": game_match.get_leader_sid() == opp_sid, "game_match_num": game_match.get_id(), "opp_nickname": player.get_nickname(), "opp_record": player.get_record(), "opp_profile_img": player.get_profile_img(), "idx": game_match.num_of_wating_player()}
-            emit('newPlayerMatched', response_data, room=opp.get_sid())
+            emit('newPlayerMatched', response_data, room=opp_sid)
     
     # 새로운 플레이어에게 이전 매칭된 플레이어들의 정보 전달
     for opp_sid in game_match.get_players().keys():
         if opp_sid != sid and player_sessions[opp_sid]:
             opp = player_sessions[opp_sid]
             response_data = {"leader": game_match.get_leader() == player, "game_match_num": game_match.get_id(), "opp_nickname": opp.get_nickname(), "opp_record": opp.get_record(), "opp_profile_img": opp.get_profile_img()}
-            emit('gameMatchComplete', response_data, room=player.get_sid())
+            emit('gameMatchComplete', response_data, room=sid)
             # print(f"send to a-sid: {player_a.get_sid()}")
 
 
@@ -339,6 +340,7 @@ def start_game(data):
 
     # 여기서 게임 만들기.
     bingo_game = create_game_room(game_match)
+    print("match size!!!!!:", len(game_match.get_players()))
 
     # 게임 매칭 완료시키고, 대기열에서 삭제
     game_match.game_start()
@@ -396,14 +398,11 @@ def bingo(data):
     game_room_num = data["gameRoomNum"]
     bingo_game = bingo_games[game_room_num]
 
-    nickname = data["nickname"]
-    player = find_user(nickname)  # 유저를 find_user() 메소드로 찾음
-
-    if player:
-        result = bingo_game.check_bingo(player)
+    if request.sid in player_sessions.keys():
+        result = bingo_game.check_bingo(request.sid)
 
         response_data = {"result": result}
-        emit("bingoGameResult", response_data, room=player.get_sid())
+        emit("bingoGameResult", response_data, room=request.sid)
     else:
         print(f"User not found: {nickname}")
 
