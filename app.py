@@ -226,6 +226,14 @@ def on_disconnect():
             game_match.remove_player(request.sid)
             print("Remove player at match by Client disconneted")
 
+            for player_sid in game_match.get_players().keys():
+                emit("playerOutOfMatch")
+                for opp_sid in game_match.get_players().keys():
+                    if opp_sid != player_sid and player_sessions[opp_sid]:
+                        opp = player_sessions[opp_sid]
+                        response_data = {"leader": game_match.get_leader_sid() == opp_sid, "game_match_num": game_match.get_id(), "opp_nickname": player.get_nickname(), "opp_record": player.get_record(), "opp_profile_img": player.get_profile_img(), "idx": game_match.num_of_wating_player()}
+                        emit('newPlayerMatched', response_data, room=opp.get_sid())
+
     if request.sid in player_sessions.keys() or player_sessions[request.sid]:
         print("Remove player at sessions by Client disconneted")
         del player_sessions[request.sid]

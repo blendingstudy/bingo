@@ -137,6 +137,16 @@ socket.on('newPlayerMatched', function(data) {
     localStorage.setItem("gameMatchNum", gameMatchNum)
 })
 
+// 어떤 플레이어가 나감
+socket.on("playerOutOfMatch", () => {
+    opp_players = document.getElementsByClassName("profile-box opponent-profile")
+    for(let i=0; i<opp_player_idx; i++){
+        opp_players.item(i).innerHTML = ``;
+        console.log("플레이어 나가서 전체 삭제함!")
+    }
+    opp_player_idx = 0
+})
+
 // 게임 시작버튼 클릭
 function startGame(){
     const data = {"game_match_num": gameMatchNum}
