@@ -11,8 +11,8 @@ class User:
         self.bingo_card = None
         self.sid = None
         self.record = {'win': win, 'lose': lose}
-        self.is_waiting = False
         self.profile_img = profile_img
+        self.game_match_num = 0
         self.connection = pymysql.connect(host=BingoData.MYSQL_HOST,
                              user=BingoData.MYSQL_USER,
                              password=BingoData.MYSQL_PW,
@@ -32,20 +32,21 @@ class User:
     def get_sid(self):
         return self.sid
 
-    def get_is_waiting(self):
-        return self.is_waiting
-
     def get_id(self):
         return self.id
 
     def get_profile_img(self):
         return self.profile_img
 
+    def get_game_match_num(self):
+        return self.game_match_num
+
     def set_sid(self, sid):
         self.sid = sid
 
-    def set_is_waiting(self, is_waiting):
-        self.is_waiting = is_waiting
+    def set_game_match_num(self, game_match_num):
+        print("game match num:", game_match_num)
+        self.game_match_num = game_match_num
 
     def win(self):
         self.record['win'] += 1

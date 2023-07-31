@@ -22,6 +22,7 @@ Session(app)
 socketio = SocketIO(app, manage_session=False)
 
 client_sessions = {}
+player_sessions = {}
 bingo_games = {}
 game_matchs = {}
 GAME_MATCH_CNT = 1
@@ -212,10 +213,23 @@ def find_user(nickname):
 
 @socketio.on('connect', namespace='/')
 def on_connect():
+    player_sessions[request.sid] = None
     print('Client connected:', request.sid)
 
 @socketio.on('disconnect', namespace='/')
 def on_disconnect():
+    # 게임 매칭에서 제외
+    if player_sessions[request.sid]:
+        player = player_sessions[request.sid]
+        if player.get_game_match_num() in game_matchs.keys():
+            game_match = game_matchs[player.get_game_match_num()]
+            game_match.remove_player(request.sid)
+            print("Remove player at match by Client disconneted")
+
+    if request.sid in player_sessions.keys() or player_sessions[request.sid]:
+        print("Remove player at sessions by Client disconneted")
+        del player_sessions[request.sid]
+
     print('Client disconnected', request.sid)
 
 # [SOCKET] resetSID
@@ -232,19 +246,32 @@ def reset_sid(data):
         print(f"User not found: {nickname}")
 
 
+@socketio.on("setSID", namespace='/')
+def set_sid(data):
+    nickname = data["nickname"]
+    user = find_user(nickname)  # 유저를 find_user() 메소드로 찾음
+
+    if user:
+        player_sessions[request.sid] = user
+        user.set_sid(request.sid)
+        print(f"Set SID for user: {nickname}, SID: {request.sid}")
+    else:
+        print(f"User not found: {nickname}")
+
+
 # [SOCKET] waiting
-# 게임 매칭 대기
+# 게임 매칭
 @socketio.on('waiting', namespace='/')
 def ready(data):
 
     nickname = data['nickname']
     print(f"game ready: {nickname}, sid: {request.sid}")
 
-    if nickname not in client_sessions.keys():
+    if request.sid not in player_sessions.keys():
         print("fail to find user(유저정보 발견 실패)")
         return
 
-    player = client_sessions[nickname]
+    player = player_sessions[request.sid]
 
     global GAME_MATCH_CNT
 
@@ -253,27 +280,31 @@ def ready(data):
         prev_game_match = game_matchs[GAME_MATCH_CNT-1]
         if prev_game_match.num_of_wating_player() < BingoData.MAX_PLAYER_SIZE and not prev_game_match.is_match_complete():
             print("add player at prev_matcing")
-            prev_game_match.add_player(player)
-            send_match_player_info(player, prev_game_match)
+            player.set_game_match_num(GAME_MATCH_CNT-1)
+            prev_game_match.add_player(request.sid, player)
+            send_match_player_info(request.sid, player, prev_game_match)
     # 새로운 매칭 만들기
     else:
         print("new matching")
+        player.set_game_match_num(GAME_MATCH_CNT)
         game_match = GameMatch(GAME_MATCH_CNT)
-        game_match.add_player(player)
+        game_match.add_player(request.sid, player)
         game_matchs[GAME_MATCH_CNT] = game_match
         GAME_MATCH_CNT += 1
 
 
-def send_match_player_info(player, game_match):
-    # 새로운 플레이어의 정보 전달
-    for opp in game_match.get_players().values():
-        if opp != player:
-            response_data = {"leader": game_match.get_leader() == opp, "game_match_num": game_match.get_id(), "opp_nickname": player.get_nickname(), "opp_record": player.get_record(), "opp_profile_img": player.get_profile_img(), "idx": game_match.num_of_wating_player()}
+def send_match_player_info(sid, player, game_match):
+    # 다른 플레이어들에겐 새로운 플레이어의 정보 전달
+    for opp_sid in game_match.get_players().keys():
+        if opp_sid != sid and player_sessions[opp_sid]:
+            opp = player_sessions[opp_sid]
+            response_data = {"leader": game_match.get_leader_sid() == opp_sid, "game_match_num": game_match.get_id(), "opp_nickname": player.get_nickname(), "opp_record": player.get_record(), "opp_profile_img": player.get_profile_img(), "idx": game_match.num_of_wating_player()}
             emit('newPlayerMatched', response_data, room=opp.get_sid())
     
-    # 새로운 플레이어에게 이전 매칭된 플레이어 정보 전달
-    for opp in game_match.get_players().values():
-        if opp != player:
+    # 새로운 플레이어에게 이전 매칭된 플레이어들의 정보 전달
+    for opp_sid in game_match.get_players().keys():
+        if opp_sid != sid and player_sessions[opp_sid]:
+            opp = player_sessions[opp_sid]
             response_data = {"leader": game_match.get_leader() == player, "game_match_num": game_match.get_id(), "opp_nickname": opp.get_nickname(), "opp_record": opp.get_record(), "opp_profile_img": opp.get_profile_img()}
             emit('gameMatchComplete', response_data, room=player.get_sid())
             # print(f"send to a-sid: {player_a.get_sid()}")
@@ -297,9 +328,8 @@ def start_game(data):
     response_data = {"gameRoomNum" : bingo_game.get_game_room_num()}
     
     # 모든 플레이어를 게임페이지로 이동시키기
-    for player in bingo_game.get_players().values():
-        player.set_is_waiting(False)
-        emit("moveGamePage", response_data, room=player.get_sid())
+    for player_sid in bingo_game.get_players().keys():
+        emit("moveGamePage", response_data, room=player_sid)
 
 def create_game_room(game_match):
     # MySQL 데이터베이스에 게임방 생성
@@ -320,17 +350,14 @@ def enter_game_room(data):
     game_room_num = data["gameRoomNum"]
     bingo_game = bingo_games[game_room_num]
 
-    nickname = data["nickname"]
-    player = find_user(nickname)  # 유저를 find_user() 메소드로 찾음
-
-    if player:
+    if request.sid in player_sessions.keys():
         bingo_game.player_ready()
 
         # 플레이어 정보, 상대방 정보, 내 빙고판 정보 넘겨주기.
         response_data = {
-            "player": bingo_game.get_my_info(player),
-            "opp_players": bingo_game.get_opp_info(player),
-            "bingo_card": bingo_game.get_my_bingo_card(player)
+            "player": bingo_game.get_my_info(request.sid),
+            "opp_players": bingo_game.get_opp_info(request.sid),
+            "bingo_card": bingo_game.get_my_bingo_card(request.sid)
         }
         emit("bingoGameInfo", response_data, room=request.sid)
 
@@ -364,4 +391,4 @@ def bingo(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)

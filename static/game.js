@@ -4,6 +4,9 @@ let gameRoomNum; // 게임방 번호
 const nickname = localStorage.getItem("nickname") // 닉네임
 let myBingoCardCells;
 let gameOver = false;
+const WAITING_PAGE = 0;
+const GAME_PAGE = 1;
+let pageStatus = WAITING_PAGE;
 
 console.log("닉네임: " + nickname)
 
@@ -11,7 +14,10 @@ let userNickname = localStorage.getItem('nickname');  // Retrieve nickname from 
 let gameMatchNum;
 
 resetSID();
-waiting();
+setSID();
+setTimeout(() => {
+    waiting();
+}, 1000)
 getUserInfo();
 
 // sid 다시 세팅
@@ -21,6 +27,14 @@ function resetSID(){
     }
     
     socket.emit("resetSID", data)
+}
+
+function setSID(){
+    const data = {
+        "nickname" : nickname
+    }
+    
+    socket.emit("setSID", data)
 }
 
 function getUserInfo(){
@@ -134,7 +148,10 @@ socket.on("moveGamePage", (data) => {
     gameRoomNum = data.gameRoomNum
 
     startCountdown();
-    setTimeout(() => {changePageFromWaitingToGame();}, 3000);
+    setTimeout(() => {
+        changePageFromWaitingToGame();
+        pageStatus = GAME_PAGE;
+    }, 3000);
     
 })
 
@@ -160,7 +177,7 @@ function changePageFromWaitingToGame(){
     let gameBody = document.getElementById("game");
     let waitingBody = document.getElementById("waiting");
 
-    gameBody.style.display = "block";
+    gameBody.style.display = "flex";
     waitingBody.style.display = "none";
 
     enterGameRoom();
@@ -389,3 +406,16 @@ function openModal(isUserVictory) {
 function moveMypage(){
     window.location.href = '/mypage';
 }
+
+// 페이지가 로드될 때 이벤트 리스너를 등록합니다.
+window.onload = function() {
+    // 페이지가 새로고침될 때 발생하는 이벤트 리스너를 등록합니다.
+    if (pageStatus == GAME_PAGE){
+        window.addEventListener('beforeunload', function(event) {
+            // 이벤트가 발생할 때 Alert 창을 띄웁니다.
+            event.preventDefault(); // 이벤트 기본 동작을 막습니다.
+            event.returnValue = ''; // 이벤트 리스너에서 반환 값을 빈 문자열로 설정하여 브라우저가 경고 창을 표시하도록 합니다.
+            alert('페이지를 떠나시겠습니까?');
+        });
+    }
+};

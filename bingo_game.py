@@ -10,8 +10,8 @@ from bingo_dao import BingoDao
 
 class BingoGame:
     def __init__(self, game_room_num):
-        self.players = {}
         self.game_room_num = game_room_num
+        self.players = {}
         self.ready_cnt = 0
         self.scheduler = sched.scheduler(time.time, time.sleep)
         self.random_numbers = []
@@ -25,8 +25,9 @@ class BingoGame:
         return self.players
         
     # 내 정보
-    def get_my_info(self, player):
-        if player in self.players.values():
+    def get_my_info(self, sid):
+        if sid in self.players.keys():
+            player = self.players[sid]
             response_data = {
                 "nickname" : player.get_nickname(),
                 "record" : player.get_record(),
@@ -36,11 +37,11 @@ class BingoGame:
             return response_data
         
     # 상대 플레이어 정보
-    def get_opp_info(self, player):
+    def get_opp_info(self, player_sid):
         responses = []
-        for opp in self.players.values():
-            if(opp != player):
-
+        for opp_sid in self.players.keys():
+            if(opp_sid != player_sid):
+                opp = self.players[opp_sid]
                 response_data = {
                     "id" : opp.get_id(),
                     "nickname" : opp.get_nickname(),
@@ -52,9 +53,9 @@ class BingoGame:
         return responses
 
     # 내 빙고판  
-    def get_my_bingo_card(self, player):
-        if player in self.players.values():
-
+    def get_my_bingo_card(self, sid):
+        if sid in self.players.keys():
+            player = self.players[sid]
             if player.get_bingo_card() != None:
                 return player.get_bingo_card()
             else :
@@ -62,12 +63,14 @@ class BingoGame:
 
 
     # 플레이어 추가
-    def add_player(self, player):
-        self.players[player.get_nickname()] = player
+    def add_player(self, sid, player):
+        self.players[sid] = player
         self.generate_players_bingo_card()
 
+    # 플레이어 설정
     def set_players(self, players):
-        self.players = players
+        for player in players.values():
+            self.players[player.get_sid()] = player
         self.generate_players_bingo_card()
 
     # 플레이어들의 빙고판 생성

@@ -4,6 +4,7 @@ class GameMatch:
         self.players = {}
         self.match_complete = False
         self.leader = None
+        self.leader_sid = None
 
     def get_players(self):
         return self.players
@@ -14,6 +15,9 @@ class GameMatch:
     def get_leader(self):
         return self.leader
 
+    def get_leader_sid(self):
+        return self.leader_sid
+
     def is_match_complete(self):
         return self.match_complete
 
@@ -23,20 +27,21 @@ class GameMatch:
     def num_of_wating_player(self):
         return len(self.players)
 
-    def add_player(self, player):
+    def add_player(self, sid, player):
         # 먼저 들어온 사람이 방장이 되어, 게임시작 권한을 갖게됨.
         if not self.leader:
             self.leader = player
+            self.leader_sid = sid
             print(f"{player}is leader at matching {self.id}")
-        self.players[player.get_nickname()] = player
+        self.players[sid] = player
         print(f"{player}is add to match at matching {self.id}")
 
-    def remove_player(self, player):
-        if player in self.players:
-            self.players.remove(player)
-            print(f"{player}이(가) 매칭에서 제거되었습니다.")
+    def remove_player(self, sid):
+        if sid in self.players.keys():
+            del self.players[sid]
+            print(f"{sid}이(가) 매칭에서 제거되었습니다.")
         else:
-            print(f"{player}을(를) 찾을 수 없습니다.")
+            print(f"{sid}을(를) 찾을 수 없습니다.")
 
     def display_players(self):
         if self.players:

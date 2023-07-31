@@ -1,13 +1,3 @@
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-    background-color: #f7f7f7;
-    margin: 0px;
-}
-
 #waiting {
     display: flex;
     justify-content: center;
