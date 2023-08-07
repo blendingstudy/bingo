@@ -36,7 +36,7 @@ function setSID(){
 function getUserInfo(){
     console.log("유저정보 요청 시도:", nickname)
 
-    const url = "http://localhost:5000/user?nickname=" + nickname 
+    const url = "http://prgstudy.com:5000/user?nickname=" + nickname 
 
     fetch(url, {
         method: 'GET',

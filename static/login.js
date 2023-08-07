@@ -10,7 +10,7 @@ function login() {
         "password": inputPW
     };
 
-    fetch("http://localhost:5000/login", {
+    fetch("http://prgstudy.com:5000/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json' // 요청 헤더에 JSON 형식을 명시적으로 지정

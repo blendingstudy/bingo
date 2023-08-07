@@ -58,7 +58,7 @@ function signup(nickname, password, referral){
         "referral": referral
     };
 
-    fetch("http://localhost:5000/signup", {
+    fetch("http://prgstudy.com:5000/signup", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json' // 요청 헤더에 JSON 형식을 명시적으로 지정
@@ -97,7 +97,7 @@ function checkNicknameDuplicate(){
         return;
     }
 
-    fetch(`http://localhost:5000//user/duplicate?nickname=${nickname}`, {
+    fetch(`http://prgstudy.com:5000/user/duplicate?nickname=${nickname}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json' // 요청 헤더에 JSON 형식을 명시적으로 지정

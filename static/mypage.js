@@ -9,7 +9,7 @@ getUserInfo()
 function getUserInfo(){
     console.log("유저정보 요청 시도:", userNickname)
 
-    const url = "http://localhost:5000/user?nickname=" + userNickname 
+    const url = "http://prgstudy.com:5000/user?nickname=" + userNickname 
 
     fetch(url, {
         method: 'GET',
