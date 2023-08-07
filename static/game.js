@@ -133,6 +133,7 @@ socket.on('newPlayerMatched', function(data) {
     localStorage.setItem("gameMatchNum", gameMatchNum)
 })
 
+
 // 어떤 플레이어가 나감
 socket.on("playerOutOfMatch", function() {
     console.log("플레이어 나감")
@@ -147,6 +148,7 @@ socket.on("playerOutOfMatch", function() {
     const data = {"game_match_num": gameMatchNum}
     socket.emit("resendPlayerMathcInfo", data)
 })
+
 
 // 게임 시작버튼 클릭
 function startGame(){
@@ -192,6 +194,8 @@ function changePageFromWaitingToGame(){
 
     enterGameRoom();
 }
+
+// ------------- 게임 페이지 관련 코드 --------------------
 
 // 게임방 입장 알림
 function enterGameRoom(){
@@ -303,33 +307,6 @@ function checkBingo(x, y, bingoCardCells){
     }, 2000);
 }
 
-
-function initializeOwnProfile(nickname, record, profile_img) {
-    const ownProfileBox = document.querySelector('.user .profile-section');
-    ownProfileBox.innerHTML = `
-    <div class="profile-section-picture">
-        <img class="profile-image" src=${profile_img} alt="프로필 이미지">
-    </div>
-    <div class="profile-info">
-        <h2 class="nickname">${nickname}</h2>
-        <h3>전적</h3>
-        <p class="record">${record}</p>
-    </div>
-`;
-}
-
-function initializeOpponentProfile(nickname, record, profile_img, i) {
-    const opponentProfileBox = document.querySelectorAll('.opponent .profile-section');
-    opponentProfileBox.item(i).innerHTML = `
-    <div class="profile-section-picture">
-        <img class="profile-image" src=${profile_img} alt="프로필 이미지">
-    </div>
-    <div class="profile-info">
-        <h2 class="nickname">${nickname}</h2>
-    </div>
-`;
-}
-
 // 내 빙고판 그리기
 function displayMyBoard(selector, board) {
     let container = document.querySelector(selector);
@@ -362,6 +339,32 @@ function displayOppBoard(selector, num, playerId) {
             container.appendChild(cell);
         }
     }
+}
+
+function initializeOwnProfile(nickname, record, profile_img) {
+    const ownProfileBox = document.querySelector('.user .profile-section');
+    ownProfileBox.innerHTML = `
+    <div class="profile-section-picture">
+        <img class="profile-image" src=${profile_img} alt="프로필 이미지">
+    </div>
+    <div class="profile-info">
+        <h2 class="nickname">${nickname}</h2>
+        <h3>전적</h3>
+        <p class="record">${record}</p>
+    </div>
+`;
+}
+
+function initializeOpponentProfile(nickname, record, profile_img, i) {
+    const opponentProfileBox = document.querySelectorAll('.opponent .profile-section');
+    opponentProfileBox.item(i).innerHTML = `
+    <div class="profile-section-picture">
+        <img class="profile-image" src=${profile_img} alt="프로필 이미지">
+    </div>
+    <div class="profile-info">
+        <h2 class="nickname">${nickname}</h2>
+    </div>
+`;
 }
 
 function displayBall(selector, ball, color) {
