@@ -169,18 +169,20 @@ def userInfo():
         return jsonify(error_message), 500
 
 
-# @app.route('/userRead')
-# def user_read():
-#     # 데이터베이스 쿼리
-#     with connection.cursor() as cursor:
-#         cursor.execute('SELECT * FROM user')
-#         results = cursor.fetchall()
+@app.route('/userRead')
+def user_read():
+    # 데이터베이스 쿼리
+    with connection.cursor() as cursor:
+        cursor.execute('SELECT * FROM user')
+        results = cursor.fetchall()
 
-#     # 결과 출력
-#     for row in results:
-#         print(row)
+    # 결과 출력
+    response = []
+    for row in results:
+        print(row)
+        response.append(row)
 
-#     return 'MySQL 연동 예시'
+    return jsonify(response)
 
 
 # [GET] /test
