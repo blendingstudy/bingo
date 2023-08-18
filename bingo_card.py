@@ -15,6 +15,8 @@ class BingoCard:
 
     def create_card(self, num_list):
         if len(num_list) != self.num_of_ticket*5:
+            print(num_list)
+            print(self.num_of_ticket)
             raise ValueError("num_list should contain ticket number*5")
         self.cards = [num_list[i:i+5] for i in range(0, len(num_list), 5)]
 
@@ -23,8 +25,9 @@ class BingoCard:
             if num in row:
                 col_idx = row.index(num)
                 self.checks[row_idx][col_idx] = 1
-                return True
-        return False
+                return True, row_idx, col_idx
+            
+        return False, -1, -1
 
     def check_bingo(self):
         for row in self.checks:
