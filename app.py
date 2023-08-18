@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, jsonify
+from flask import Flask, render_template, request, session, jsonify, send_from_directory
 from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect
 from flask_session import Session  # for server-side sessions
 import os
@@ -10,6 +10,7 @@ import pymysql.cursors
 from game_match import GameMatch
 import random
 from bingo_dao import BingoDao
+import time
 
 app = Flask(__name__)
 
@@ -68,6 +69,20 @@ def game_room_list_page():
 @app.route('/game')
 def game_page():
     return render_template('game.html')
+
+@app.route('/game2')
+def game2_page():
+    return render_template('game2.html')
+
+@app.route('/img/ticket')
+def show_image():
+    # 이미지 파일이 있는 폴더 경로
+    image_folder = 'img'
+    
+    # 이미지 파일명
+    image_filename = 'game_ticket.png'  # 이미지 파일명을 적절하게 변경하세요
+    
+    return send_from_directory(image_folder, image_filename)
 
 
 # [GET] /login
@@ -265,6 +280,7 @@ def set_sid(data):
     else:
         print(f"User not found: {nickname}")
 
+
 # 게임 매칭정보 요청
 @socketio.on('resendPlayerMathcInfo', namespace='/')
 def resend_player_match_info(data):
@@ -278,7 +294,6 @@ def resend_player_match_info(data):
             opp = player_sessions[opp_sid]
             response_data = {"leader": game_match.get_leader_sid() == opp_sid, "game_match_num": game_match.get_id(), "opp_nickname": player.get_nickname(), "opp_record": player.get_record(), "opp_profile_img": player.get_profile_img(), "idx": game_match.num_of_wating_player()}
             emit('newPlayerMatched', response_data, room=opp_sid)
-
 
 
 # [SOCKET] waiting
@@ -330,84 +345,96 @@ def send_match_player_info(sid, player, game_match):
             response_data = {"leader": game_match.get_leader() == player, "game_match_num": game_match.get_id(), "opp_nickname": opp.get_nickname(), "opp_record": opp.get_record(), "opp_profile_img": opp.get_profile_img()}
             emit('gameMatchComplete', response_data, room=sid)
             # print(f"send to a-sid: {player_a.get_sid()}")
+        else:
+            send_sold_ticket_list(sid, game_match)
+
+# 티켓 판매 현황
+def send_sold_ticket_list(player_sid, game_match):
+    ticket_list = game_match.get_ticket_list()
+
+    response_data = {
+        "ticket_list" : ticket_list
+    }
+
+    emit("soldTicketList", response_data, room=player_sid)
 
 
-# [SOCKET] startGame
-# 유저의 게임 시작 요청
-@socketio.on('startGame', namespace='/')
-def start_game(data):
 
+# 티켓 구매
+@socketio.on('buyTicket', namespace='/')
+def buy_ticket(data):
+    # 필요한 데이터
+    # 유저sid, 게임매칭id, 티켓id
     game_match_num = data["game_match_num"]
+    ticket_id = data["ticket_id"]
+
     game_match = game_matchs[game_match_num]
 
-    # 여기서 게임 만들기.
-    bingo_game = create_game_room(game_match)
-    print("match size!!!!!:", len(game_match.get_players()))
+    ticket_buy_success = game_match.buy_ticket(request.sid, ticket_id)
 
-    # 게임 매칭 완료시키고, 대기열에서 삭제
-    game_match.game_start()
-    del game_matchs[game_match_num]
+    if ticket_buy_success:
+        for player_sid in game_match.get_players().keys():
+            if player_sid == request.sid:
+                response_data = {
+                    "ticket_id" : ticket_id
+                }
+                emit("successTicketBuy", response_data, room=player_sid)
+                continue
 
-    response_data = {"gameRoomNum" : bingo_game.get_game_room_num()}
-    
-    # 모든 플레이어를 게임페이지로 이동시키기
-    for player_sid in bingo_game.get_players().keys():
-        emit("moveGamePage", response_data, room=player_sid)
-
-def create_game_room(game_match):
-    # MySQL 데이터베이스에 게임방 생성
-    game_room_id = bingoDao.save_game_room(game_match.get_players())
-
-    # 게임방 만들기
-    bingo_game = BingoGame(game_room_id)
-    bingo_game.set_players(game_match.get_players())
-    bingo_games[game_room_id] = bingo_game
-
-    return bingo_game
+            # 구매 완료시, 모든 플레이어들에게 emit해줘야함.
+            response_data = {
+                "ticket_id" : ticket_id
+            }
+            emit("ticketSold", response_data, room=player_sid)
 
 
-# [SOCKET] enterGameRoom
-# 플레이어가 게임방에 들어왔음을 알림
-@socketio.on("enterGameRoom", namespace='/')
-def enter_game_room(data):
-    game_room_num = data["gameRoomNum"]
-    bingo_game = bingo_games[game_room_num]
+    # 티켓 다 팔리면 게임 시작해야함.
+    if game_match.get_left_ticket_num() == 0:
+        print("all ticket sold out(티켓 다 팔림): game_match_num=", game_match_num)
+        print(game_match.get_players())
+        del game_matchs[game_match_num] # 게임 매칭 데이터 삭제
+        game_start(game_match.get_players(), game_match.get_tickets())
 
-    if request.sid in player_sessions.keys():
-        bingo_game.player_ready()
-
-        # 플레이어 정보, 상대방 정보, 내 빙고판 정보 넘겨주기.
-        response_data = {
-            "player": bingo_game.get_my_info(request.sid),
-            "opp_players": bingo_game.get_opp_info(request.sid),
-            "bingo_card": bingo_game.get_my_bingo_card(request.sid)
-        }
-        emit("bingoGameInfo", response_data, room=request.sid)
-
-        # 다 게임방에 들어왔으면 게임 시작하기.
-        if bingo_game.is_every_player_ready():
-            bingo_game.start_game()
-    else:
-        print(f"User not found: {nickname}")
+    return
 
 
-# [SOCKET] bingo
-# 빙고 버튼 클릭.
-# 빙고가 맞으면 게임 끝
-# 아니면 계속 게임하기.
-@socketio.on("bingo", namespace='/')
-def bingo(data):
-    game_room_num = data["gameRoomNum"]
-    bingo_game = bingo_games[game_room_num]
+# 게임 시작
+def game_start(players, tickets):
+    # 빙고게임 만들기
+    game_room_num = bingoDao.save_game_room(players)
 
-    if request.sid in player_sessions.keys():
-        result = bingo_game.check_bingo(request.sid)
+    bingo_game = BingoGame(game_room_num, players, tickets)
 
-        response_data = {"result": result}
-        emit("bingoGameResult", response_data, room=request.sid)
-    else:
-        print(f"User not found: {nickname}")
+    bingo_games[game_room_num] = bingo_game 
+            
+    for player_sid in players.keys():
+        emit("countDown", room=player_sid)
 
+    # 4초 후에 게임 시작
+    time.sleep(4)
+
+    # 빙고 게임 정보 전달
+    bingo_cards = bingo_game.get_bingo_cards()
+    for player_sid in bingo_cards.keys():
+        response_data = {}
+        opp_player_info = []
+
+        for opp_sid, opp_bingo_card in bingo_cards.items():
+            if player_sid == opp_sid: # 나일 경우
+                response_data["myBingoCard"] = opp_bingo_card.get_cards()
+            else: # 상대 플레이어일 경우
+                opp_player = player_sessions[opp_sid]
+                opp_player_info.append({
+                    "oppId" : opp_player.get_id(), 
+                    "oppBingoCard" : opp_bingo_card.get_cards()
+                })
+            
+        response_data["oppInfo"] = opp_player_info
+        emit("gameStartInfo", response_data, room=player_sid)
+
+    # 1초 후 게임 시작
+    time.sleep(1)
+    bingo_game.game_start()
 
 
 if __name__ == '__main__':

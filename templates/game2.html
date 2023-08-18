@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game</title>
+    <script src="https://cdn.socket.io/4.2.0/socket.io.js"></script>
+    <link rel="stylesheet" href="/static/game2.css">
+    <script src="/static/game2.js" defer></script>
+</head>
+<body>
+    <div id="game">
+        <div id="game-container">
+
+            <!-- 상대 플레이어 섹션 -->
+            <section id="opponent-player-section">
+                <section class="player-section opponent" id="opponent-player-section-1">
+                    <div class="player opponent"></div>
+                    <div class="player opponent"></div>
+                    <div class="player opponent"></div>
+                </section>
+    
+    
+                <!-- 공 섹션 -->
+                <section id="ball-drawing-section" style="display: none;">
+                    <div class="ball-container"></div>
+                    <div class="recent-balls"></div>
+                </section>
+    
+                <!-- 티켓 섹션 -->
+                <section id="ticket-list-section" >
+                    <img class="ticket" id="ticket-0" src="/img/ticket">
+                    <img class="ticket" id="ticket-1" src="/img/ticket">
+                    <img class="ticket" id="ticket-2" src="/img/ticket">
+                    <img class="ticket" id="ticket-3" src="/img/ticket">
+                    <img class="ticket" id="ticket-4" src="/img/ticket">
+                    <img class="ticket" id="ticket-5" src="/img/ticket">
+                    <img class="ticket" id="ticket-6" src="/img/ticket">
+                    <img class="ticket" id="ticket-7" src="/img/ticket">
+                    <img class="ticket" id="ticket-8" src="/img/ticket">
+                    <img class="ticket" id="ticket-9" src="/img/ticket">
+                </section>
+
+                <!-- 카운트다운 바 -->
+                <section id="count-down-section" style="display: none;">
+                    <div id="countdown-container">
+                        <div id="countdown-progress"></div>
+                    </div>
+                </section>
+    
+                
+                <section class="player-section opponent" id="opponent-player-section-2">
+                    <div class="player opponent"></div>
+                    <div class="player opponent"></div>
+                    <div class="player opponent"></div>
+                </section>
+            </section>
+
+            <!-- 사용자 섹션 -->
+            <section id="user-player-section">
+                <section class="player-section user">
+                    <div class="player user">
+                        <div class="profile-section"> 
+                            <div class="profile-img"></div>
+                            <div class="nickname" id="own-nickname"></div>
+                        </div>
+                        <div class="bingo-container">
+                            <div class="bingo-board">
+                                <!-- Bingo board will be filled dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+            
+            
+            <!-- 승패 모달창 -->
+            <div id="gameOverModal" style="display: none;">
+                <div id="gameOverModalContent">
+                    <div class="modal-header" id="gameOverModalHeader">
+                        <!-- Victory or Defeat will be inserted here -->
+                    </div>
+                    <div class="modal-body" id="gameOverModalBody">
+                        <!-- A custom message will be inserted here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button id="gameOverModalButton" onclick="moveMypage()">마이페이지로 돌아가기</button>
+                    </div>
+                </div>
+            </div> 
+            
+        </div>
+    </div>
+</body>
+</html>

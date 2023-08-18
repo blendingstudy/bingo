@@ -1,65 +1,36 @@
-import random
-from bingo_data import BingoData
-
 class BingoCard:
-    def __init__(self):
-        self.card = [[0] * 5 for _ in range(5)]  # 빙고판
-        self.check = [[0] * 5 for _ in range(5)]  # 빙고판 체크
-
-        self.create_card()
-
-    def create_card(self):
-        numbers = random.sample(range(1, BingoData.BINGO_MAX_NUMBER+1), 25)  # 1부터 50까지 중복없이 25개의 숫자를 선택
-        for i in range(5):
-            for j in range(5):
-                self.card[i][j] = numbers[i * 5 + j]
-
-    def check_number(self, number):
-        for i in range(5):
-            for j in range(5):
-                if self.card[i][j] == number:
-                    self.check[i][j] = 1
-                    return True, i, j
+    def __init__(self, num):
+        self.cards = []
+        self.checks = [[0 for _ in range(5)] for _ in range(num)]
+        self.num_of_ticket = num
         
+    def get_cards(self):
+        return self.cards
+    
+    def get_checks(self):
+        return self.checks
+    
+    def get_num_of_ticket(self):
+        return self.num_of_ticket
+
+    def create_card(self, num_list):
+        if len(num_list) != self.num_of_ticket*5:
+            print(num_list)
+            print(self.num_of_ticket)
+            raise ValueError("num_list should contain ticket number*5")
+        self.cards = [num_list[i:i+5] for i in range(0, len(num_list), 5)]
+
+    def check(self, num):
+        for row_idx, row in enumerate(self.cards):
+            if num in row:
+                col_idx = row.index(num)
+                self.checks[row_idx][col_idx] = 1
+                return True, row_idx, col_idx
+            
         return False, -1, -1
 
     def check_bingo(self):
-        # 가로 빙고 체크
-        horizontal_bingo = 0
-        for i in range(5):
-            if all(self.check[i]):
-                horizontal_bingo += 1
-
-        # 세로 빙고 체크
-        vertical_bingo = 0
-        for j in range(5):
-            if all(self.check[i][j] for i in range(5)):
-                vertical_bingo += 1
-
-        # 대각선 빙고 체크
-        diagonal_bingo = 0
-        if all(self.check[i][i] for i in range(5)):
-            diagonal_bingo += 1
-        if all(self.check[i][4-i] for i in range(5)):
-            diagonal_bingo += 1
-
-        total_bingo = horizontal_bingo + vertical_bingo + diagonal_bingo
-        return total_bingo >= 2
-
-    def display_card(self):
-        for i in range(5):
-            for j in range(5):
-                print(f'{self.card[i][j]:2}', end=' ')
-            print()
-
-    def display_check(self):
-        for i in range(5):
-            for j in range(5):
-                print(f'{self.check[i][j]:2}', end=' ')
-            print()
-            
-    def get_card(self):
-        return self.card
-
-    def get_check(self):
-        return self.check
+        for row in self.checks:
+            if all(cell == 1 for cell in row):
+                return True
+        return False

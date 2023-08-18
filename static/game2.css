@@ -1,0 +1,281 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    margin: 0px;
+}
+
+#game {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f7f7f7;
+    width: 900px;
+}
+
+#game-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around; 
+    width: 90%;
+    height: 80%;
+    padding: 5% 5%;
+}
+
+#opponent-player-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#user-player-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.player {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease;
+    margin-bottom: 5px;
+    width: 185px;
+    height: 220px;
+}
+
+/* 프로필 섹션 */
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    border-radius: 10px 10px 0px 0px;
+    background-color: #f8f8f8;
+    height: 80px;
+}
+
+.profile-section .profile-img {
+    margin-left: 7px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #d1d9e0;
+    transition: transform 0.3s ease;
+}
+
+.profile-section .profile-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.profile-section .nickname {
+    margin-left: 10px;
+}
+
+/* 빙고판 */
+.bingo-container{
+    width: 100%;
+    height: 140px;
+}
+
+.bingo-card {
+    display: flex;
+    height: calc(180px / 5);
+    gap: 5px;
+}
+
+.bingo-cell {
+    width: calc(100% - 5px);
+    height: calc(100% - 5px);
+    background-color: #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bingo-cell.check {
+    background-color: #ffca37;
+}
+
+
+/* 공 */
+#ball-drawing-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 180px;
+    position: relative;
+    margin-left:20px;
+    margin-right: 20px;
+}
+
+.ball-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background-color: #efefef;
+    left: 0;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.recent-balls {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    width: 80px;
+    height: 320px;
+    border-radius: 20px;
+    background-color: #f3f3f3;
+    overflow: auto;
+    right: 0;
+    z-index: 0;
+    padding-bottom: 10px;
+    overflow: hidden;
+}
+
+.ball {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 50%;
+    display: inline-block;
+    text-align: center;
+    margin-bottom: 3px;
+}
+
+@keyframes slideDown {
+    0% {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+}
+
+@keyframes scaleUp {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(2);
+    }
+}
+
+/* 티켓 */
+#ticket-list-section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 180px;
+}
+
+.ticket{
+    width: 150px;
+    cursor: pointer;
+}
+
+.ticket.sold {
+    filter: grayscale(100%);
+    cursor: default;
+}
+
+/* 카운트다운 바 */
+#count-down-section {
+    display: flex;
+    justify-content: center;
+    width: 180px;
+    height: 350px;
+}
+
+#countdown-container {
+    display: flex;
+    justify-content: center;
+    width: 10px;
+    background-color: #f0f0f0;
+    height: 90%;
+}
+
+#countdown-progress {
+    height: 100%;
+    width: 100%;
+    background-color: #4caf50;
+    transition: height 0.3s ease; /* 부드러운 모션 적용 */
+}
+
+/* 게임 오버 모달창 */
+#gameOverModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+#gameOverModalContent {
+    position: relative;
+    margin: 15% auto;
+    padding: 20px;
+    width: 280px;
+    height: 280px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.modal-header {
+    text-align: center;
+    padding: 15px;
+    background-color: #5472b8;
+    color: white;
+    font-size: 2em; /* adjust this value to your liking */
+    font-weight: bold;
+}
+
+.modal-body {
+    text-align: center;
+    margin: 30px;
+    margin-top: 25%;
+    font-size: 15px; /* adjust this value to your liking */
+}
+
+.modal-footer {
+    text-align: center;
+    padding: 5px;
+    color: white;
+}
+
+#gameOverModalButton {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5472b8;
+    color: white;
+    cursor: pointer;
+    margin-top: 10%;
+    transition: background-color 0.3s ease;
+}
+
+#gameOverModalButton:hover {
+    background-color: #3f5d99;
+}

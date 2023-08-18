@@ -43,5 +43,5 @@ function getUserInfo(){
 
 // Redirect to waiting.html when start button is clicked
 document.getElementById('start-button').addEventListener('click', function() {
-    window.location.href = '/game';
+    window.location.href = '/game2';
 });
