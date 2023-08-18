@@ -81,12 +81,14 @@ class BingoGame:
                     "y": y
                 }
                 emit("checkRandomNumber", response_data, room=player_sid)
+
+                player_id = self.players[player_sid].get_id()
                 
                 # 상대 플레이어에게 알려주기
                 for opp_sid, opp in self.players.items():
                     if opp_sid != player_sid:
                         response_data = {
-                            "oppId" : opp.get_id(),
+                            "oppId" : player_id,
                             "num" : number,
                             "x": x,
                             "y": y
