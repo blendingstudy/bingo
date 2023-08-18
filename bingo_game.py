@@ -38,7 +38,7 @@ class BingoGame:
     # 랜덤 숫자 발표
     def create_random_num(self):
         # 1~50사이 중복없이 랜덤 숫자 발표
-        number = random.sample([x for x in range(1, BingoData.BINGO_MAX_NUMBER + 1) if x not in  self.created_random_nums], 1)[0]
+        number = random.choice([x for x in range(1, BingoData.BINGO_MAX_NUMBER+1) if x not in self.created_random_nums])
         self.created_random_nums.append(number)
 
         print("create random num(랜덤 숫자 생성)=", number)
@@ -62,6 +62,7 @@ class BingoGame:
         self.scheduler.run()
 
     def send_created_number_to_player(self, number):
+        # 모든 플레이어에게 숫자 알림
         for player_sid in self.players.keys():
             response_data = {
                 "num" : number

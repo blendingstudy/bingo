@@ -80,8 +80,49 @@ socket.on("soldTicketList", (data) => {
 
 // 랜덤 숫자 발표
 socket.on("announceRandomNumber", (data) => {
-    
+    const ball_num = data.num
+    let ballColor = getRandomColor()
+    displayBall('.ball-container', ball_num, ballColor);
+    displayBall('.recent-balls', ball_num, ballColor);
 })
+
+// 랜덤 숫자 생성
+function getRandomColor() {
+    const colors = ["#b5c4e0", "#879ebf", "#d6d1e0", "#aebfd9", "#c4ccd9"]; // Change these to your preferred colors
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+// 화면에 공 표시
+function displayBall(selector, ball, color) {
+    let container = document.querySelector(selector);
+    let ballElement = document.createElement('div');
+    ballElement.classList.add('ball');
+    ballElement.textContent = ball;
+
+    // Give the ball a shape with a background color
+    ballElement.style.backgroundColor = color;
+
+    if (selector === '.recent-balls') {
+        if (container.childElementCount >= MAX_BALLS_DISPLAYED) {
+            for(let i=0; i<container.childElementCount-MAX_BALLS_DISPLAYED; i++){ // 넘치게 있었으면 다 삭제
+                container.removeChild(container.lastElementChild);
+            }
+            setTimeout(() => {  // Add a delay before removing the oldest ball
+                container.removeChild(container.lastElementChild);
+            }, 2000);  // Delay time in milliseconds (505ms = 0.505s)
+        }
+        setTimeout(() => {
+            ballElement.style.animation = "slideDown 0.5s ease-out";  // Make the animation faster
+            container.insertBefore(ballElement, container.firstChild);
+        }, 2000)
+        
+    } else {
+        // If the container is for the ball-container, just replace the existing ball
+        container.innerHTML = "";
+        container.appendChild(ballElement);
+        ballElement.style.animation = "scaleUp 2s ease-out";
+    }
+}
 
 
 // 랜덤 숫자 일치!
