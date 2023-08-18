@@ -7,13 +7,64 @@ import sched
 import time
 
 class BingoGame:
-    def __init__(self, game_room_num, players, tickets):
+    # def __init__(self, game_room_num, players, tickets):
+    #     self.game_room_num = game_room_num
+    #     self.players = players # 키=player_sid / 값=User.class
+    #     self.bingo_cards = self.create_bingo_cards(tickets) # 키=player_sid / 값=BingoCard.class
+    #     self.game_over = False
+    #     self.created_random_nums = []
+    #     self.scheduler = sched.scheduler(time.time, time.sleep)
+
+    #     ### 버전2 시작
+    #     self.tickets = {} # 키=player_sid / 값=구매한 티켓 개수
+    #     self.ticket_list = [0,0,0,0,0,0,0,0,0,0]
+    #     self.left_ticket = 10
+    #     self.match_complete = False
+    #     ### 버전2 끝
+
+    def __init__(self, game_room_num, players):
         self.game_room_num = game_room_num
         self.players = players # 키=player_sid / 값=User.class
-        self.bingo_cards = self.create_bingo_cards(tickets) # 키=player_sid / 값=BingoCard.class
+        self.bingo_cards = None# 키=player_sid / 값=BingoCard.class
         self.game_over = False
         self.created_random_nums = []
         self.scheduler = sched.scheduler(time.time, time.sleep)
+
+        ### 버전2 시작
+        self.tickets = {} # 키=player_sid / 값=구매한 티켓 개수
+        self.ticket_list = [0,0,0,0,0,0,0,0,0,0]
+        self.left_ticket = 10
+        self.match_complete = False
+        ### 버전2 끝
+
+    ### 버전2 시작
+
+    def add_player(self, sid, player):
+        self.players[sid] = player
+        self.tickets[sid] = 0
+        print(f"{player}is add to match at matching {self.id}")
+
+    def remove_player(self, sid):
+        if sid in self.players.keys():
+            del self.players[sid]
+            del self.tickets[sid]
+            print(f"{sid}is remove at match!!!!")
+        else:
+            print(f"{sid}can't find at match!!!")
+
+    def buy_ticket(self, player_sid, ticket_id):
+        if self.tickets[player_sid] >= 5: # 5개 이하까지만 구매 가능
+            return False
+        if self.ticket_list[ticket_id]: # 이미 구매된 티켓
+            return False
+
+        self.tickets[player_sid] += 1
+        self.ticket_list[ticket_id] = 1
+        self.left_ticket -= 1
+
+        return True
+
+    ### 버전2 끝
 
     def get_bingo_cards(self):
         return self.bingo_cards

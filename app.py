@@ -184,6 +184,53 @@ def userInfo():
         return jsonify(error_message), 500
 
 
+# [GET] /user?nickname=
+# 게임방 리스트 정보
+@app.route('/gameroom/list/info', methods=['GET'])
+def game_room_list():
+
+    game_room_list_data = bingoDao.find_game_room_list()
+
+    game_room_list = []
+    for game in game_room_list_data:
+        print(game)
+        game_room_list_data = bingoDao.fing_game_member_list(game["bingo_game_room_id"])
+
+        players = {}
+
+        
+
+        players2 = []
+
+        for member in game_room_list_data:
+            print(member)
+            players[member["sid"]] = User(member["player_id"], member["nickname"], 0, 0, member["profile_img"])
+            user_data = {
+                "player_id": member["player_id"],
+                "nickname": member["nickname"],
+                "profile_img": member["profile_img"]
+            }
+
+            players2.append(user_data)
+
+        bingo_game = BingoGame(game["bingo_game_room_id"], players)
+
+        game_room_data = {
+            "game_room_id": game["bingo_game_room_id"],
+            "players": players2
+        }
+
+        game_room_list.append(game_room_data)
+
+    response_data = {
+        "game_room_list" : game_room_list
+    }
+
+    return jsonify(response_data)
+
+
+
+
 @app.route('/userRead')
 def user_read():
     # 데이터베이스 쿼리
