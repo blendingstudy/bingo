@@ -189,35 +189,57 @@ def userInfo():
 @app.route('/gameroom/list/info', methods=['GET'])
 def game_room_list():
 
-    game_room_list_data = bingoDao.find_game_room_list()
+    # game_room_list_data = bingoDao.find_game_room_list()
+
+    # game_room_list = []
+    # for game in game_room_list_data:
+    #     print(game)
+    #     game_room_list_data = bingoDao.fing_game_member_list(game["bingo_game_room_id"])
+
+    #     players = []
+    #     for member in game_room_list_data:
+    #         print(member)
+    #         user_data = {
+    #             "player_id": member["player_id"],
+    #             "nickname": member["nickname"],
+    #             "profile_img": member["profile_img"]
+    #         }
+
+    #         players.append(user_data)
+
+    #     game_room_data = {
+    #         "game_room_id": game["bingo_game_room_id"],
+    #         "status": game["status"],
+    #         "players": players
+    #     }
+
+    #     game_room_list.append(game_room_data)
+
+    # response_data = {
+    #     "game_room_list" : game_room_list
+    # }
+
+    # return jsonify(response_data)
 
     game_room_list = []
-    for game in game_room_list_data:
+    for game_id, game in game_matchs.items():
         print(game)
-        game_room_list_data = bingoDao.fing_game_member_list(game["bingo_game_room_id"])
 
-        players = {}
-
-        
-
-        players2 = []
-
-        for member in game_room_list_data:
+        players = []
+        for member in game.get_players().values():
             print(member)
-            players[member["sid"]] = User(member["player_id"], member["nickname"], 0, 0, member["profile_img"])
             user_data = {
-                "player_id": member["player_id"],
-                "nickname": member["nickname"],
-                "profile_img": member["profile_img"]
+                "player_id": member.get_id(),
+                "nickname": member.get_nickname(),
+                "profile_img": member.get_profile_img()
             }
 
-            players2.append(user_data)
-
-        bingo_game = BingoGame(game["bingo_game_room_id"], players)
+            players.append(user_data)
 
         game_room_data = {
-            "game_room_id": game["bingo_game_room_id"],
-            "players": players2
+            "game_room_id": game_id,
+            "status": "WAITING",
+            "players": players
         }
 
         game_room_list.append(game_room_data)
