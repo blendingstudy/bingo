@@ -184,18 +184,89 @@ def userInfo():
         return jsonify(error_message), 500
 
 
-# @app.route('/userRead')
-# def user_read():
-#     # 데이터베이스 쿼리
-#     with connection.cursor() as cursor:
-#         cursor.execute('SELECT * FROM user')
-#         results = cursor.fetchall()
+# [GET] /user?nickname=
+# 게임방 리스트 정보
+@app.route('/gameroom/list/info', methods=['GET'])
+def game_room_list():
 
-#     # 결과 출력
-#     for row in results:
-#         print(row)
+    # game_room_list_data = bingoDao.find_game_room_list()
 
-#     return 'MySQL 연동 예시'
+    # game_room_list = []
+    # for game in game_room_list_data:
+    #     print(game)
+    #     game_room_list_data = bingoDao.fing_game_member_list(game["bingo_game_room_id"])
+
+    #     players = []
+    #     for member in game_room_list_data:
+    #         print(member)
+    #         user_data = {
+    #             "player_id": member["player_id"],
+    #             "nickname": member["nickname"],
+    #             "profile_img": member["profile_img"]
+    #         }
+
+    #         players.append(user_data)
+
+    #     game_room_data = {
+    #         "game_room_id": game["bingo_game_room_id"],
+    #         "status": game["status"],
+    #         "players": players
+    #     }
+
+    #     game_room_list.append(game_room_data)
+
+    # response_data = {
+    #     "game_room_list" : game_room_list
+    # }
+
+    # return jsonify(response_data)
+
+    game_room_list = []
+    for game_id, game in game_matchs.items():
+        print(game)
+
+        players = []
+        for member in game.get_players().values():
+            print(member)
+            user_data = {
+                "player_id": member.get_id(),
+                "nickname": member.get_nickname(),
+                "profile_img": member.get_profile_img()
+            }
+
+            players.append(user_data)
+
+        game_room_data = {
+            "game_room_id": game_id,
+            "status": "WAITING",
+            "players": players
+        }
+
+        game_room_list.append(game_room_data)
+
+    response_data = {
+        "game_room_list" : game_room_list
+    }
+
+    return jsonify(response_data)
+
+
+
+
+@app.route('/userRead')
+def user_read():
+    # 데이터베이스 쿼리
+    with connection.cursor() as cursor:
+        cursor.execute('SELECT * FROM user')
+        results = cursor.fetchall()
+
+    # 결과 출력
+    response = []
+    for row in results:
+        print(row)
+        response.append(row)
+
+    return jsonify(response)
 
 
 # [GET] /test

@@ -59,6 +59,22 @@ class BingoDao:
 
     #---------게임----------#
 
+    # 게임방 리스트 조회
+    def find_game_room_list(self):
+        with self.connection.cursor() as cursor:
+            cursor.execute("select * from bingo_game_room")
+        
+        bingo_game_room_list = cursor.fetchall()
+        return bingo_game_room_list
+
+    # 게임 참여자 조회
+    def fing_game_member_list(self, game_room_id):
+        with self.connection.cursor() as cursor:
+            cursor.execute("select player_id, sid, nickname, profile_img from game_member member join user  on user_id = player_id where bingo_game_room_id = %s", (game_room_id, ))
+        
+        game_member_list = cursor.fetchall()
+        return game_member_list
+
     # 게임방 생성
     def save_game_room(self, players):
         status = "WAITING"

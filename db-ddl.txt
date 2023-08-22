@@ -23,6 +23,7 @@ CREATE TABLE game_member (
     bingo_game_room_id INT,
     player_id INT,
     is_win BOOLEAN DEFAULT FALSE,
+    sid VARCHAR(100),
     FOREIGN KEY (bingo_game_room_id) REFERENCES bingo_game_room(bingo_game_room_id),
     FOREIGN KEY (player_id) REFERENCES user(user_id)
 );
