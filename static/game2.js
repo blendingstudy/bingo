@@ -21,10 +21,23 @@ const socket = io() // 웹소켓 초기화
 setSID();
 
 setTimeout(() => {
+    enterGameRoom();
+}, 1000)
+
+
+setTimeout(() => {
     waiting();
 }, 1000)
 
 getUserInfo();
+
+function enterGameRoom(){
+    const data = {
+        "game_match_num" : Number(localStorage.getItem("gameMatchNum"))
+    }
+
+    socket.on("enterGameRoom")
+}
 
 // 클릭 이벤트 리스너 등록
 for(let i=0; i<tickets.length; i++){

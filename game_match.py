@@ -5,7 +5,7 @@ class GameMatch:
         self.tickets = {} # 키=player_sid / 값=구매한 티켓 개수
         self.ticket_list = [0,0,0,0,0,0,0,0,0,0]
         self.left_ticket = 10
-        self.match_complete = False
+        self.waiting = True
         # 나중에 리더는 삭제해줘야함
         self.leader = None
         self.leader_sid = None
@@ -31,11 +31,11 @@ class GameMatch:
     def get_left_ticket_num(self):
         return self.left_ticket
 
-    def is_match_complete(self):
-        return self.match_complete
+    def is_waiting(self):
+        return self.waiting
 
     def game_start(self):
-        self.match_complete = True
+        self.waiting = False
 
     def num_of_wating_player(self):
         return len(self.players)
