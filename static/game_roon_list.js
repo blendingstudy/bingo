@@ -78,7 +78,7 @@ function createGameRooms(dummyGameData) {
         gameRoomElement.addEventListener("click", () => {
             alert("클릭! " + gameData.gameRoomId)
             localStorage.setItem("gameMatchNum", gameData.gameRoomId)
-            window.location.href = '/game2';
+            window.location.href = '/game';
         })
 
         gameRoomsContainer.appendChild(gameRoomElement);
