@@ -27,7 +27,7 @@ function login() {
         // 응답 데이터 처리
         console.log(data)
         localStorage.setItem('nickname', inputNickname);  // Now userNickname is accessible here
-        localStorage.setItem('userId', data.user_id);
+        localStorage.setItem('userId', data.userId);
         window.location.href = '/mypage';
     })
     .catch(error => {

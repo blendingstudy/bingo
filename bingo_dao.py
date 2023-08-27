@@ -93,15 +93,6 @@ class BingoDao:
         return game_room_id
 
 
-    # 게임 승리
-    def win_bingo_game(self, winner, game_room_num):
-        with self.connection.cursor() as cursor:
-            # Increase the win count in the database for the user_id
-            sql_query = "UPDATE game_member SET is_win = 1 WHERE player_id = %s and bingo_game_room_id = %s"
-            values = (winner.get_id(), game_room_num, )
-            cursor.execute(sql_query, values)
-            self.connection.commit()
-
     # 게임 종료
     def game_over(self, game_room_num):
         with self.connection.cursor() as cursor:

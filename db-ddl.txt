@@ -7,8 +7,6 @@ CREATE TABLE user (
     nickname VARCHAR(50) NOT NULL,
     password VARCHAR(50) NOT NULL,
     referral INT,
-    win INT DEFAULT 0,
-    lose INT DEFAULT 0,
     profile_img VARCHAR(500),
     FOREIGN KEY (referral) REFERENCES user(user_id)
 );
@@ -22,7 +20,6 @@ CREATE TABLE game_member (
     game_member_id INT PRIMARY KEY AUTO_INCREMENT,
     bingo_game_room_id INT,
     player_id INT,
-    is_win BOOLEAN DEFAULT FALSE,
     sid VARCHAR(100),
     FOREIGN KEY (bingo_game_room_id) REFERENCES bingo_game_room(bingo_game_room_id),
     FOREIGN KEY (player_id) REFERENCES user(user_id)

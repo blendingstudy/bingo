@@ -30,8 +30,6 @@ function getUserInfo(){
             document.getElementById("profile-picture").appendChild(imgElement);
 
             document.getElementById('user-nickname').textContent = data.nickname;
-            let record = data.record.win + '승 ' + data.record.lose + '패';
-            document.getElementById('record').textContent = record;
         })
         .catch(error => {
             // 에러 처리
@@ -43,5 +41,5 @@ function getUserInfo(){
 
 // Redirect to waiting.html when start button is clicked
 document.getElementById('start-button').addEventListener('click', function() {
-    window.location.href = '/game2';
+    window.location.href = '/gameroom/list';
 });

@@ -2,6 +2,7 @@ const nickname = localStorage.getItem("nickname")
 
 getGameRoomList();
 
+// 게임방 리스트 정보 얻기
 function getGameRoomList(){
     const url = "http://localhost:5000/gameroom/list/info"
 
@@ -14,7 +15,7 @@ function getGameRoomList(){
         .then(response => response.json()) // 응답을 JSON 형식으로 파싱
         .then(data => {
             // 응답 데이터 처리
-            createGameRooms(data.game_room_list)
+            createGameRooms(data.gameRoomList)
             
         })
         .catch(error => {
@@ -25,6 +26,7 @@ function getGameRoomList(){
 
 }
 
+// 게임방 요소 만들어 화면에 뿌리기
 function createGameRooms(dummyGameData) {
     console.log(dummyGameData)
     const gameRoomsContainer = document.getElementById("gameRoomsContainer");
@@ -32,7 +34,7 @@ function createGameRooms(dummyGameData) {
     for(let gameData of dummyGameData){
         const gameRoomElement = document.createElement("div");
         gameRoomElement.classList.add("game-room");
-        gameRoomElement.id = "game-room-id-" + gameData.game_room_id;
+        gameRoomElement.id = "game-room-id-" + gameData.gameRoomId;
 
         const gameInfoContainerElement = document.createElement("div");
         gameInfoContainerElement.classList.add("game-info-container");
@@ -40,7 +42,7 @@ function createGameRooms(dummyGameData) {
 
         const gameIdElement = document.createElement("div");
         gameIdElement.classList.add("game-id");
-        gameIdElement.textContent = "No. " + gameData.game_room_id;
+        gameIdElement.textContent = "No. " + gameData.gameRoomId;
 
         const gamePlayerContainerElement = document.createElement("div");
         gamePlayerContainerElement.classList.add("game-player-container");
@@ -58,7 +60,7 @@ function createGameRooms(dummyGameData) {
         for(let player of gameData.players){
             const imgElement = document.createElement("img");
             imgElement.classList.add("profile-image");
-            imgElement.src = player.profile_img;
+            imgElement.src = player.profileImg;
             imgElement.alt = "프로필 이미지";
             profileImagesElement.appendChild(imgElement);
         }
@@ -72,9 +74,10 @@ function createGameRooms(dummyGameData) {
         gameRoomElement.appendChild(gameInfoContainerElement);
         gameRoomElement.appendChild(gamePlayerContainerElement);
 
+        // 이벤트 리스너 등록
         gameRoomElement.addEventListener("click", () => {
-            alert("클릭! " + gameData.game_room_id)
-            localStorage.setItem("gameMatchNum", gameData.game_room_id)
+            alert("클릭! " + gameData.gameRoomId)
+            localStorage.setItem("gameMatchNum", gameData.gameRoomId)
             window.location.href = '/game2';
         })
 
@@ -82,7 +85,7 @@ function createGameRooms(dummyGameData) {
     }
 }
 
-
+// 새 게임방 만들기
 function createNewGame(){
     const data = {
         "nickname": nickname
@@ -101,13 +104,13 @@ function createNewGame(){
         }
         // 상태 코드 확인
         console.log('Status Code:', response.status);
-        return response.text(); // JSON 파싱하여 반환
+        return response.json(); // JSON 파싱하여 반환
       })
     .then(data => {
         // 응답 데이터 처리
-        console.log(data)
+        console.log(data.gameMatchNum)
         localStorage.setItem("gameMatchNum", data.gameMatchNum)
-        window.location.href = '/game2';
+        window.location.href = '/game';
     })
     .catch(error => {
         // 에러 처리
