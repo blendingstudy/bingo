@@ -14,7 +14,7 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #f7f7f7;
-    width: 500px;
+    width: 900px;
 }
 
 #game-container {
@@ -26,187 +26,93 @@ body {
     padding: 5% 5%;
 }
 
-.player-section {
-    display: flex;
-    margin-bottom: 15px;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.player-section-3 {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    height: 30%;
-}
-
-#temp {
+#opponent-player-section {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
 }
 
-.player-section-1 .bingo-container {
-    flex-direction: row-reverse;
-}
-
-.profile-picture {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background-color: #d1d9e0;
-    margin-bottom: 20px;
-    transition: transform 0.3s ease;
-}
-
-.profile-image {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-}
-
-.bingo-container {
+#user-player-section {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    width: 100%;
-    height: 70%;
-}
-
-.opponent .bingo-board {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 5px;
-    justify-items: center;
-    align-items: center;
-    width: 180px;
-    height: 180px;
-    border: 1px solid #ccc;
-    background-color: #ffffff;
-}
-
-.bingo-board {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 5px;
-    justify-items: center;
-    align-items: center;
-    width: 230px;
-    height: 230px;
-    border: 1px solid #ccc;
-    background-color: #ffffff;
-}
-
-.cell {
-    display: flex;
     justify-content: center;
-    align-items: center;
-    width: calc(100% - 5px);
-    height: calc(100% - 5px);
-    background-color: #f3f3f3;
-    transition: background-color 0.3s ease;
 }
 
-.cell.called {
-    background-color: #ffca37;
-}
-
-.bingo-button {
-    width: 60px;
-    height: 230px;
-    border: none;
-    background-color: #ccc;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    outline: none;
-    transition: background-color 0.3s ease;
-}
-
-.user .bingo-button:disabled{
-    background-color: #ff4e4e;
-}
-
-.user .bingo-button:disabled:hover{
-    background-color: #ff0000;
-}
-
-.user .bingo-button:hover {
-    background-color: #3f5d99;
-}
-
-/* Profile related CSS here */
-.opponent .profile-section {
+.player {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     border: 1px solid #ccc;
     border-radius: 10px;
-    padding: 20px;
     background-color: #ffffff;
-    width: 80px;
-    height: 130px;
     transition: background-color 0.3s ease;
+    margin-bottom: 5px;
+    width: 185px;
+    height: 220px;
 }
+
+/* 프로필 섹션 */
 
 .profile-section {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 20px;
-    background-color: #ffffff;
-    width: 130px;
-    height: max-content;
-    transition: background-color 0.3s ease;
+    border-radius: 10px 10px 0px 0px;
+    background-color: #f8f8f8;
+    height: 80px;
 }
 
-.profile-section:hover {
-    background-color: #f3f3f3;
-}
-
-.profile-section-picture {
+.profile-section .profile-img {
+    margin-left: 7px;
     width: 60px;
     height: 60px;
     border-radius: 50%;
     background-color: #d1d9e0;
-    margin-bottom: 10px;
     transition: transform 0.3s ease;
 }
 
-.profile-section-picture:hover {
-    transform: scale(1.1);
+.profile-section .profile-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
 }
 
 .profile-section .nickname {
-    font-size: 24px;
-    margin-bottom: 5px;
-    color: #333333;
+    margin-left: 10px;
 }
 
-.profile-section .record {
-    font-size: 16px;
-    color: #777;
+/* 빙고판 */
+.bingo-container{
+    width: 100%;
+    height: 140px;
 }
 
+.bingo-card {
+    display: flex;
+    height: calc(180px / 5);
+    gap: 5px;
+}
+
+.bingo-cell {
+    width: calc(100% - 5px);
+    height: calc(100% - 5px);
+    background-color: #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bingo-cell.check {
+    background-color: #ffca37;
+}
+
+
+/* 공 */
 #ball-drawing-section {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    position: relative;
-    margin-left:20px;
-    margin-right: 20px;
+    width: 180px;
 }
 
 .ball-container {
@@ -217,11 +123,9 @@ body {
     height: 110px;
     border-radius: 50%;
     background-color: #efefef;
-    /* position: absolute; */
     left: 0;
     overflow: hidden;
     z-index: 1;
-    /* margin-left: 50px; */
 }
 
 .recent-balls {
@@ -234,12 +138,8 @@ body {
     border-radius: 20px;
     background-color: #f3f3f3;
     overflow: auto;
-    /* position: absolute; */
     right: 0;
     z-index: 0;
-    /* margin-right: 50px; */
-    /* padding-right: 20px; */
-    /* padding-top: 50px; */
     padding-bottom: 10px;
     overflow: hidden;
 }
@@ -272,8 +172,50 @@ body {
     100% {
       transform: scale(2);
     }
-  }
+}
 
+/* 티켓 */
+#ticket-list-section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 180px;
+}
+
+.ticket{
+    width: 150px;
+    cursor: pointer;
+}
+
+.ticket.sold {
+    filter: grayscale(100%);
+    cursor: default;
+}
+
+/* 카운트다운 바 */
+#count-down-section {
+    display: flex;
+    justify-content: center;
+    width: 180px;
+    height: 350px;
+}
+
+#countdown-container {
+    display: flex;
+    justify-content: center;
+    width: 10px;
+    background-color: #f0f0f0;
+    height: 90%;
+}
+
+#countdown-progress {
+    height: 100%;
+    width: 100%;
+    background-color: #4caf50;
+    transition: height 0.3s ease; /* 부드러운 모션 적용 */
+}
+
+/* 게임 오버 모달창 */
 #gameOverModal {
     display: none;
     position: fixed;
@@ -333,35 +275,4 @@ body {
 
 #gameOverModalButton:hover {
     background-color: #3f5d99;
-}
-
-.ready-button-section button:disabled {
-    opacity: 0.5; /* 투명도 조절 */
-    cursor: not-allowed; /* 커서 스타일 변경 */
-    /* 기타 원하는 스타일 지정 */
-}
-
-
-.profile-info h2,
-.profile-info h3,
-.profile-info p {
-    margin: 0;
-    text-align: center;
-}
-
-.profile-info h2 {
-    font-size: 24px;
-    margin-bottom: 10px;
-    color: #333333;
-}
-
-.profile-info h3 {
-    font-size: 20px;
-    margin-bottom: 5px;
-    color: #666666;
-}
-
-.profile-info p {
-    font-size: 16px;
-    color: #777;
 }

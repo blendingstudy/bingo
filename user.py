@@ -5,19 +5,12 @@ import pymysql.cursors
 
 class User:
 
-    def __init__(self, id, nickname, win, lose, profile_img):
+    def __init__(self, id, nickname, profile_img):
         self.id = id
         self.nickname = nickname
         self.bingo_card = None
-        self.record = {'win': win, 'lose': lose}
         self.profile_img = profile_img
         self.game_match_num = 0
-        self.connection = pymysql.connect(host=BingoData.MYSQL_HOST,
-                             user=BingoData.MYSQL_USER,
-                             password=BingoData.MYSQL_PW,
-                             db=BingoData.MYSQL_DB,
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
 
     def get_nickname(self):
         return self.nickname
@@ -40,30 +33,6 @@ class User:
     def set_game_match_num(self, game_match_num):
         print("game match num:", game_match_num)
         self.game_match_num = game_match_num
-
-    def win(self):
-        self.record['win'] += 1
-        self.update_win_in_db()
-
-    def update_win_in_db(self):
-         with self.connection.cursor() as cursor:
-            # Increase the win count in the database for the user_id
-            sql_query = "UPDATE user SET win = win + 1 WHERE user_id = %s"
-            values = (self.id,)
-            cursor.execute(sql_query, values)
-            self.connection.commit()
-
-    def lose(self):
-        self.record['lose'] += 1
-        self.update_lose_in_db()
-
-    def update_lose_in_db(self):
-        with self.connection.cursor() as cursor:
-            # Increase the lose count in the database for the user_id
-            sql_query = "UPDATE user SET lose = lose + 1 WHERE user_id = %s"
-            values = (self.id,)
-            cursor.execute(sql_query, values)
-            self.connection.commit()
 
     def generate_bingo_card(self):
         self.bingo_card = BingoCard()
