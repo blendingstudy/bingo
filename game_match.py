@@ -32,19 +32,19 @@ class GameMatch:
         return len(self.players)
 
     # 플레이어 추가
-    def add_player(self, sid, player):
-        self.players[sid] = player
-        self.tickets[sid] = 0
+    def add_player(self, player_sid, player):
+        self.players[player_sid] = player
+        self.tickets[player_sid] = 0
         print(f"{player}is add to match at matching {self.id}")
 
     # 플레이어 삭제
-    def remove_player(self, sid):
-        if sid in self.players.keys():
-            del self.players[sid]
-            del self.tickets[sid]
-            print(f"{sid}is remove at match!!!!")
+    def remove_player(self, player_sid):
+        if player_sid in self.players.keys():
+            del self.players[player_sid]
+            del self.tickets[player_sid]
+            print(f"{player_sid}is remove at match!!!!")
         else:
-            print(f"{sid}can't find at match!!!")
+            print(f"{player_sid}can't find at match!!!")
 
     # 티켓 구매
     def buy_ticket(self, player_sid, ticket_id):

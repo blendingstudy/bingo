@@ -23,7 +23,7 @@ socketio = SocketIO(app, manage_session=False)
 bingoDao = BingoDao()
 
 client_sessions = {} # [key]nickname = [value]User.class 
-player_sessions = {} # [key]sid = [value]User.class 
+player_sessions = {} # [key]player_sid = [value]User.class 
 bingo_games = {} # [key]id = [value]BingoGame.class 
 game_matchs = {} # [key]id = [value]GameMatch.class 
 
@@ -324,11 +324,11 @@ def enter_game_room(data):
         return redirect(url_for('/gameroom/list')) # 게임방 리스트로 리다이렉트
 
 
-def send_match_player_info(sid, player, game_match):
+def send_match_player_info(player_sid, player, game_match):
     
     # 다른 플레이어들에겐 새로운 플레이어의 정보 전달
     for opp_sid in game_match.get_players().keys():
-        if opp_sid != sid and player_sessions[opp_sid]:
+        if opp_sid != player_sid and player_sessions[opp_sid]:
             opp = player_sessions[opp_sid]
             response = {"gameMatchNum": game_match.get_id(), "oppNickname": player.get_nickname(), "oppProfileImg": player.get_profile_img(), "idx": game_match.num_of_wating_player()}
             emit('newPlayerMatched', response, room=opp_sid) # 여기 room번호가 다름!
@@ -338,21 +338,20 @@ def send_match_player_info(sid, player, game_match):
     opp_player_list = []
     for opp_sid in game_match.get_players().keys():
         # 이전 매칭된 플레이어의 정보 모으기
-        if opp_sid != sid and player_sessions[opp_sid]: 
+        if opp_sid != player_sid and player_sessions[opp_sid]: 
             opp = player_sessions[opp_sid]
             opp_player_data = {"gameMatchNum": game_match.get_id(), "oppNickname": opp.get_nickname(), "oppProfileImg": opp.get_profile_img()}
             opp_player_list.append(opp_player_data)
-        # 새로운 플레이어에게 티켓정보 전달
-        else: 
-            response = {
-                "ticket_list" : game_match.get_ticket_list()
-            }
-
-            emit("soldTicketList", response, room=sid)
-
+        
     if len(opp_player_list) != 0:
         response = {"oppPlayersInfo": opp_player_list} 
-        emit('MatchedGamePlayerInfo', response, room=sid) # 여기 room번호가 다름!
+        emit('MatchedGamePlayerInfo', response, room=player_sid) # 여기 room번호가 다름!
+
+    # 새로운 플레이어에겐 팔린티켓정보 전달
+    response = {
+        "ticket_list" : game_match.get_ticket_list()
+    }
+    emit("soldTicketList", response, room=player_sid)
 
 
 # [SOCKET] buyTicket
@@ -434,4 +433,4 @@ def game_start(players, tickets):
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)

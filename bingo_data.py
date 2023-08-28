@@ -3,7 +3,7 @@ class BingoData:
     MIN_PLAYER_SIZE = 2
     BINGO_MAX_NUMBER = 50
 
-    MYSQL_PW = "nabigasalrang33" #"enfj3913"
+    MYSQL_PW = "enfj3913" #"enfj3913"
     MYSQL_HOST = "localhost"
     MYSQL_USER = "root"
     MYSQL_DB = "bingo"

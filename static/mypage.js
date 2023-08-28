@@ -1,8 +1,5 @@
 
-console.log("마이페이지 입장")
-
-let userNickname = localStorage.getItem('nickname');  // Retrieve nickname from local storage
-
+const userNickname = localStorage.getItem('nickname');  // Retrieve nickname from local storage
 
 getUserInfo()
 
@@ -39,7 +36,7 @@ function getUserInfo(){
 }
 
 
-// Redirect to waiting.html when start button is clicked
+// 게임 시작 버튼에 클릭 이벤트 등록
 document.getElementById('start-button').addEventListener('click', function() {
     window.location.href = '/gameroom/list';
 });
