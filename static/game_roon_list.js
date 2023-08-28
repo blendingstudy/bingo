@@ -77,7 +77,7 @@ function createGameRooms(dummyGameData) {
         // 이벤트 리스너 등록
         gameRoomElement.addEventListener("click", () => {
             alert("클릭! " + gameData.gameRoomId)
-            localStorage.setItem("gameMatchNum", gameData.gameRoomId)
+            localStorage.setItem("gameRoomNum", gameData.gameRoomId)
             window.location.href = '/game';
         })
 
@@ -108,8 +108,8 @@ function createNewGame(){
       })
     .then(data => {
         // 응답 데이터 처리
-        console.log(data.gameMatchNum)
-        localStorage.setItem("gameMatchNum", data.gameMatchNum)
+        console.log(data.gameRoomNum)
+        localStorage.setItem("gameRoomNum", data.gameRoomNum)
         window.location.href = '/game';
     })
     .catch(error => {

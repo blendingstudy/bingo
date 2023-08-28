@@ -75,7 +75,7 @@ class BingoDao:
         game_member_list = cursor.fetchall()
         return game_member_list
 
-    # 게임방 생성
+    # 게임방 생성 + 플레이어까지 저장
     def save_game_room(self, players):
         status = "WAITING"
         with self.connection.cursor() as cursor:
@@ -89,6 +89,18 @@ class BingoDao:
             for player in players.values():
                 cursor.execute("INSERT INTO game_member (bingo_game_room_id, player_id) VALUES (%s, %s)", (game_room_id, player.get_id()))
             self.connection.commit()
+
+        return game_room_id
+
+    # 게임방 생성
+    def save_game_room_ver2(self):
+        status = "WAITING"
+        with self.connection.cursor() as cursor:
+            # 게임방 저장
+            cursor.execute("INSERT INTO bingo_game_room (status) VALUES (%s)", (status,))
+            self.connection.commit()
+            
+            game_room_id = cursor.lastrowid
 
         return game_room_id
 

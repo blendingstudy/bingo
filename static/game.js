@@ -4,8 +4,7 @@ const MAX_TICKET_NUM = 10
 const socket = io() // 웹소켓 초기화
 
 const nickname = localStorage.getItem("nickname") // 닉네임
-let gameMatchNum = Number(localStorage.getItem("gameMatchNum")); // 게임매칭 번호
-let gameRoomNum; // 게임방 번호
+let gameRoomNum = Number(localStorage.getItem("gameRoomNum")); // 게임매칭 번호
 let gameOver = false;
 let opp_player_idx = 0
 let oppPlayerAndBingoBoardMatching = {} // 플레이어id : 빙고판 번호
@@ -19,7 +18,7 @@ const ballSection = document.getElementById("ball-drawing-section") // 공 섹�
 const ticketSection = document.getElementById("ticket-list-section"); // 티켓 섹션
 
 console.log("닉네임: " + nickname)
-console.log("게임룸 넘버: " + gameMatchNum)
+console.log("게임룸 넘버: " + gameRoomNum)
 
 setSID();
 
@@ -254,7 +253,7 @@ function getUserInfo(){
 // 게임룸 입장
 function enterGameRoom(){
     const data = {
-        "game_match_num" : gameMatchNum
+        "game_room_num" : gameRoomNum
     }
 
     console.log("게임룸 입장!")
@@ -270,7 +269,7 @@ function addClickEventToTicket(){
             // 티켓 사기
             if(!event.target.classList.contains('sold')){
                 const data = {
-                    "game_match_num" : gameMatchNum,
+                    "game_room_num" : gameRoomNum,
                     "ticket_id" : i
                 }
     
