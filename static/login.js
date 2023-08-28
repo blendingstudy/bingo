@@ -2,6 +2,7 @@
 document.getElementById("login-button").addEventListener("click", () => {
     inputNickname = document.getElementById('nickname-input').value;  // Assign value to userNickname here
     inputPW = document.getElementById('password-input').value;  // Assign value to userNickname here
+    document.getElementById("errorMessage-login").textContent = ""
 
     console.log("입장 버튼 누름!")
 
@@ -31,7 +32,7 @@ document.getElementById("login-button").addEventListener("click", () => {
         window.location.href = '/mypage';
     })
     .catch(error => {
-        alert("로그인 에러!");
+        document.getElementById("errorMessage-login").textContent = "로그인에 실패했습니다."
     });
       
     document.getElementById('nickname-input').value = "";

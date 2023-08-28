@@ -38,6 +38,12 @@ socket.on("successTicketBuy", (data) => {
     
     ticket.classList.add('sold');
     ticket.disabled = true;
+
+    const purchaseTicketContainer = document.getElementById("purchase-ticket-container");
+    let ticketElement = document.createElement("img");
+    ticketElement.classList.add("purchase-ticket");
+    ticketElement.src = "/img/ticket"
+    purchaseTicketContainer.appendChild(ticketElement);
 })
 
 // 티켓 구매 실패

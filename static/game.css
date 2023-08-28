@@ -37,6 +37,7 @@ body {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    align-items: center;
 }
 
 .player {
@@ -190,6 +191,23 @@ body {
 .ticket.sold {
     filter: grayscale(100%);
     cursor: default;
+}
+
+#purchase-ticket-section {
+    width: 80px;
+    height: 200px;
+    border: #3f5d99 1px dotted;
+    margin-left: 20px;
+}
+
+#purchase-ticket-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.purchase-ticket {
+    width: 60px;
 }
 
 /* 카운트다운 바 */
