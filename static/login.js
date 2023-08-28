@@ -1,5 +1,5 @@
-
-function login() {
+// 로그인 버튼 클릭
+document.getElementById("login-button").addEventListener("click", () => {
     inputNickname = document.getElementById('nickname-input').value;  // Assign value to userNickname here
     inputPW = document.getElementById('password-input').value;  // Assign value to userNickname here
 
@@ -27,7 +27,7 @@ function login() {
         // 응답 데이터 처리
         console.log(data)
         localStorage.setItem('nickname', inputNickname);  // Now userNickname is accessible here
-        localStorage.setItem('userId', data.user_id);
+        localStorage.setItem('userId', data.userId);
         window.location.href = '/mypage';
     })
     .catch(error => {
@@ -36,8 +36,9 @@ function login() {
       
     document.getElementById('nickname-input').value = "";
     document.getElementById('password-input').value = "";
-};
+})
 
-function moveSignupPage(){
-    window.location.href = '/signup'; // 파이썬 플라스크 서버에 해당 URL이 정의되어 있어야 합니다.
-}
+// 회원가입 페이지로 이동
+document.getElementById("signup-link").addEventListener("click", () => {
+    window.location.href = '/signup';
+})

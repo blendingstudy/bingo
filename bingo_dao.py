@@ -59,7 +59,23 @@ class BingoDao:
 
     #---------게임----------#
 
-    # 게임방 생성
+    # 게임방 리스트 조회
+    def find_game_room_list(self):
+        with self.connection.cursor() as cursor:
+            cursor.execute("select * from bingo_game_room")
+        
+        bingo_game_room_list = cursor.fetchall()
+        return bingo_game_room_list
+
+    # 게임 참여자 조회
+    def fing_game_member_list(self, game_room_id):
+        with self.connection.cursor() as cursor:
+            cursor.execute("select player_id, sid, nickname, profile_img from game_member member join user  on user_id = player_id where bingo_game_room_id = %s", (game_room_id, ))
+        
+        game_member_list = cursor.fetchall()
+        return game_member_list
+
+    # 게임방 생성 + 플레이어까지 저장
     def save_game_room(self, players):
         status = "WAITING"
         with self.connection.cursor() as cursor:
@@ -76,15 +92,18 @@ class BingoDao:
 
         return game_room_id
 
-
-    # 게임 승리
-    def win_bingo_game(self, winner, game_room_num):
+    # 게임방 생성
+    def save_game_room_ver2(self):
+        status = "WAITING"
         with self.connection.cursor() as cursor:
-            # Increase the win count in the database for the user_id
-            sql_query = "UPDATE game_member SET is_win = 1 WHERE player_id = %s and bingo_game_room_id = %s"
-            values = (winner.get_id(), game_room_num, )
-            cursor.execute(sql_query, values)
+            # 게임방 저장
+            cursor.execute("INSERT INTO bingo_game_room (status) VALUES (%s)", (status,))
             self.connection.commit()
+            
+            game_room_id = cursor.lastrowid
+
+        return game_room_id
+
 
     # 게임 종료
     def game_over(self, game_room_num):

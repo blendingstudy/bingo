@@ -1,8 +1,5 @@
 
-console.log("마이페이지 입장")
-
-let userNickname = localStorage.getItem('nickname');  // Retrieve nickname from local storage
-
+const userNickname = localStorage.getItem('nickname');  // Retrieve nickname from local storage
 
 getUserInfo()
 
@@ -30,8 +27,6 @@ function getUserInfo(){
             document.getElementById("profile-picture").appendChild(imgElement);
 
             document.getElementById('user-nickname').textContent = data.nickname;
-            let record = data.record.win + '승 ' + data.record.lose + '패';
-            document.getElementById('record').textContent = record;
         })
         .catch(error => {
             // 에러 처리
@@ -41,7 +36,7 @@ function getUserInfo(){
 }
 
 
-// Redirect to waiting.html when start button is clicked
+// 게임 시작 버튼에 클릭 이벤트 등록
 document.getElementById('start-button').addEventListener('click', function() {
-    window.location.href = '/game2';
+    window.location.href = '/gameroom/list';
 });

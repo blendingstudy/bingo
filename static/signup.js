@@ -1,7 +1,7 @@
 let isCheckPasswordDuplicate = false;
 
 // 회원가입 input validate
-function validateAndSubmit() {
+document.getElementById("signup-button").addEventListener("click", () => {
     var nickname = document.getElementById('nickname').value;
     var password = document.getElementById('password').value;
     var confirmPassword = document.getElementById('confirmPassword').value;
@@ -47,7 +47,7 @@ function validateAndSubmit() {
 
     // 여기에 회원가입 처리 로직을 추가하면 됩니다. (예: 서버로 데이터 전송 등)
     signup(nickname, password, referral)
-}
+})
 
 // 회원가입
 function signup(nickname, password, referral){
@@ -88,7 +88,7 @@ function signup(nickname, password, referral){
 }
 
 // 닉네임 중복 확인
-function checkNicknameDuplicate(){
+document.getElementById("checkNicknameDuplicate").addEventListener("click", () => {
     let errorMessageForNickname = document.getElementById('errorMessage-nickname');
     let nickname = document.getElementById('nickname').value;
 
@@ -127,4 +127,4 @@ function checkNicknameDuplicate(){
         // 에러 처리
         alert("회원가입 에러!");
     });
-}
+})
