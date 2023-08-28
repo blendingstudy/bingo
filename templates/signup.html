@@ -10,7 +10,7 @@
     <form id="signupForm">
         <div>
             <label for="nickname">닉네임</label>
-            <button type="button" id="checkNickname" onclick="checkNicknameDuplicate()">중복 확인</button>
+            <button type="button" id="checkNicknameDuplicate">중복 확인</button>
             <input type="text" id="nickname" name="nickname" required>
             <div class="errorMessage">
                 <p id="errorMessage-nickname"></p>
@@ -39,7 +39,7 @@
         </div>
         
         <div class="button">
-            <button type="button" id="signup-button" onclick="validateAndSubmit()">회원가입</button>
+            <button type="button" id="signup-button">회원가입</button>
         </div>
     </form>
 </body>

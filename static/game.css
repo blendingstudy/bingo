@@ -113,9 +113,6 @@ body {
     justify-content: center;
     align-items: center;
     width: 180px;
-    position: relative;
-    margin-left:20px;
-    margin-right: 20px;
 }
 
 .ball-container {

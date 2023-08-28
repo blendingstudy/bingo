@@ -55,28 +55,35 @@ function createGameRooms(dummyGameData) {
         playersElement.classList.add("players");
         playersElement.textContent = `${gameData.players.length}명 / 7명`;
 
-        const profileImagesElement = document.createElement("div");
-        profileImagesElement.classList.add("profile-images");
+
         for(let player of gameData.players){
+            const playerInfoElement = document.createElement("div");
+            playerInfoElement.classList.add("player-info")
+
             const imgElement = document.createElement("img");
             imgElement.classList.add("profile-image");
             imgElement.src = player.profileImg;
             imgElement.alt = "프로필 이미지";
-            profileImagesElement.appendChild(imgElement);
+
+            const playerNicknameElement = document.createElement("div");
+            playerNicknameElement.classList.add("player-nickname");
+            playerNicknameElement.textContent = `${player.nickname}`;
+            
+            playerInfoElement.appendChild(imgElement);
+            playerInfoElement.appendChild(playerNicknameElement);
+
+            gamePlayerContainerElement.appendChild(playerInfoElement);
         }
 
         gameInfoContainerElement.appendChild(gameIdElement);
         gameInfoContainerElement.appendChild(gameStatusElement);
-
-        gamePlayerContainerElement.appendChild(playersElement);
-        gamePlayerContainerElement.appendChild(profileImagesElement);
+        gameInfoContainerElement.appendChild(playersElement);
 
         gameRoomElement.appendChild(gameInfoContainerElement);
         gameRoomElement.appendChild(gamePlayerContainerElement);
 
         // 이벤트 리스너 등록
         gameRoomElement.addEventListener("click", () => {
-            alert("클릭! " + gameData.gameRoomId)
             localStorage.setItem("gameRoomNum", gameData.gameRoomId)
             window.location.href = '/game';
         })
@@ -86,7 +93,7 @@ function createGameRooms(dummyGameData) {
 }
 
 // 새 게임방 만들기
-function createNewGame(){
+document.getElementById("create-new-game-button").addEventListener("click", () => {
     const data = {
         "nickname": nickname
     };
@@ -116,4 +123,4 @@ function createNewGame(){
         // 에러 처리
         alert("새 게임 생성 에러!");
     });
-}
+})

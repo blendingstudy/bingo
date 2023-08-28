@@ -40,6 +40,11 @@ socket.on("successTicketBuy", (data) => {
     ticket.disabled = true;
 })
 
+// 티켓 구매 실패
+socket.on("failTicketBuy", () => {
+    alert("티켓 구매 실패!")
+})
+
 // 타 플레이어가 티켓 구매 성공
 socket.on("ticketSold", (data) => {
     console.log(data)
@@ -348,7 +353,7 @@ function setOppPlayersBingoCard(oppsInfo){
 
 // 랜덤 색상 생성
 function getRandomColor() {
-    const colors = ["#b5c4e0", "#879ebf", "#d6d1e0", "#aebfd9", "#c4ccd9"]; // Change these to your preferred colors
+    const colors = ["#FFB6C1", "#FFD700", "#FFFFE0", "#98FB98", "#87CEEB", "#E6E6FA", "#FFC0CB"]; // Change these to your preferred colors
     return colors[Math.floor(Math.random() * colors.length)];
 }
 
@@ -403,9 +408,7 @@ function openModal(isUserVictory) {
 }
 
 // 게임 오버 이후 마이페이지 이동 버튼
-function moveMypage(){
+document.getElementById("gameOverModalButton").addEventListener("click", () => {
     window.location.href = '/mypage';
-}
-
-
+})
 

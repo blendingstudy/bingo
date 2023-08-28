@@ -379,6 +379,8 @@ def buy_ticket(data):
                 "ticketId" : ticket_id
             }
             emit("ticketSold", response, room=player_sid)
+    else: # 티켓 구매 실패
+        emit("failTicketBuy", room=request.sid)
 
 
     # 티켓 다 팔리면 게임 시작해야함.

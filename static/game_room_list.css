@@ -1,7 +1,7 @@
 body {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     height: 100vh;
     font-family: Arial, sans-serif;
     background-color: #f7f7f7;
@@ -15,21 +15,27 @@ body {
 }
 
 .game-rooms-container {
-    display: grid;
+    /* display: grid;
     grid-template-columns: repeat(3, 1fr);
 	grid-template-rows: 200px 200px 200px;
-    grid-gap: 30px;
-    /* margin: 20px; */
+    grid-gap: 30px; */
+    display: flex;
+    flex-direction: column;
 }
 
 .game-room {
+    display: flex;
+    justify-content: space-between;
     border: 1px solid #ccc;
     border-radius: 10px;
     padding: 20px;
     background-color: #ffffff;
-    width: 200px;
+    width: 400px;
+    height: 100px;
     transition: background-color 0.3s ease;
     cursor: pointer;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .game-room:hover {
@@ -38,8 +44,8 @@ body {
 
 .game-info-container {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    margin-bottom: 30px;
 }
 
 .game-id {
@@ -51,30 +57,31 @@ body {
 }
 
 .game-player-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, 130px);
+	grid-template-rows: 50px 50px 50px;
+    grid-gap: 5px;
+    /* display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: center; */
+    margin-left: 15px;
 }
 
-.players {
+.player-info {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-}
-
-.profile-images {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
 }
 
 .profile-image {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     margin: 2px;
+}
+
+.player-nickname {
+    margin-left: 10px;
 }
 
 #create-new-game-button {
@@ -85,7 +92,8 @@ body {
     background-color: #5472b8;
     color: white;
     cursor: pointer;
-    margin-top: 10%;
+    margin-top: 20px;
+    margin-bottom: 40px;
     transition: background-color 0.3s ease;
 }
 

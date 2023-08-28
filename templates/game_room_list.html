@@ -3,20 +3,20 @@
 <head>
     <title>게임방 리스트</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="/static/game_roon_list.js" defer></script>
+    <script src="/static/game_room_list.js" defer></script>
     <link rel="stylesheet" href="/static/game_room_list.css">
 </head>
 <body>
     <div id="game-room-list">
         <h1>게임방 리스트</h1>
 
-        <!-- 게임방 리스트 -->
-        <div class="game-rooms-container" id="gameRoomsContainer">
-        </div>
-    
         <!-- 새 게임 생성 버튼 -->
         <div>
-            <button id="create-new-game-button" onclick="createNewGame()">새 게임</button>
+            <button id="create-new-game-button">새 게임</button>
+        </div>
+
+        <!-- 게임방 리스트 -->
+        <div class="game-rooms-container" id="gameRoomsContainer">
         </div>
     </div>
 </body>
