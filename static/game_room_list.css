@@ -57,7 +57,6 @@ body {
     justify-content: center;
 }
 
-
 .players {
     display: flex;
     align-items: center;
@@ -76,4 +75,20 @@ body {
     height: 50px;
     border-radius: 50%;
     margin: 2px;
+}
+
+#create-new-game-button {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5472b8;
+    color: white;
+    cursor: pointer;
+    margin-top: 10%;
+    transition: background-color 0.3s ease;
+}
+
+#create-new-game-button:hover {
+    background-color: #3f5d99;
 }
